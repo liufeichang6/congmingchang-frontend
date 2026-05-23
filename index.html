@@ -1497,7 +1497,7 @@
             return result.value;
         }
 
-// ========== 生成题目（调用大模型） ==========
+// ========== 生成题目（直接调用豆包大模型） ==========
 async function generateQuestions() {
     if (!uploadedFileName && uploadStatus.textContent.indexOf('解析成功') === -1) {
         showToastMsg('⚠️ 请先上传 Word 文档', 'error');
@@ -1518,7 +1518,7 @@ async function generateQuestions() {
     else if (type === '多选题') typeInstruction = '全部为多选题，每个题目有4个选项，正确答案可能为多个。';
     else typeInstruction = '混合出题：部分为单选题，部分为多选题。';
 
-    const maxChars = 3000; // 减少文档长度，提高响应速度
+    const maxChars = 2000; // 截取前2000字符，提高响应速度
     const textForPrompt = extractedText ? extractedText.slice(0, maxChars) : '（暂无文档，请生成一道生物选择题）';
 
     const prompt = `
@@ -1532,23 +1532,25 @@ async function generateQuestions() {
         ${textForPrompt}
     `;
 
-    // --- 调用后端代理 API ---
+    // --- 直接调用豆包大模型 ---
     try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 30000); // 30秒超时
 
-        // ✅ 这里改成了调用你的后端，而不是直接调用豆包
-        const response = await fetch(`${API_BASE_URL}/generate-question`, {
+        const response = await fetch('https://ark.cn-beijing.volces.com/api/v3/chat/completions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${authToken}` // 需要登录后的 Token
+                'Authorization': 'Bearer ark-7cb73d67-00b8-4fe7-90a1-8c5cdd03466e-bb512'
             },
             body: JSON.stringify({
-                prompt: prompt,
-                count: count,
-                diff: diff,
-                type: type
+                model: 'doubao-seed-2-0-code-preview-260215',
+                messages: [
+                    { role: 'system', content: '你是一个专业的教育出题助手，只输出 JSON 格式。' },
+                    { role: 'user', content: prompt }
+                ],
+                temperature: 0.7,
+                max_tokens: 4000
             }),
             signal: controller.signal
         });
@@ -1556,7 +1558,7 @@ async function generateQuestions() {
         clearTimeout(timeoutId);
 
         if (!response.ok) {
-            let errMsg = `后端代理请求失败 (${response.status})`;
+            let errMsg = `豆包 API 请求失败 (${response.status})`;
             try {
                 const errData = await response.json();
                 if (errData.error) errMsg += ': ' + errData.error;
@@ -1564,16 +1566,14 @@ async function generateQuestions() {
             throw new Error(errMsg);
         }
 
-        // --- 获取原始文本并清理 ---
+        // --- 获取并解析返回数据 ---
         const rawText = await response.text();
         let jsonStr = rawText.trim();
-        // 去除可能的 Markdown 标记
         if (jsonStr.startsWith('```json')) jsonStr = jsonStr.slice(7);
         else if (jsonStr.startsWith('```')) jsonStr = jsonStr.slice(3);
         if (jsonStr.endsWith('```')) jsonStr = jsonStr.slice(0, -3);
         jsonStr = jsonStr.trim();
 
-        // --- 解析 JSON ---
         let questions = JSON.parse(jsonStr);
         if (!Array.isArray(questions) || questions.length === 0) {
             throw new Error('AI 返回的题目为空');
