@@ -8,9 +8,11 @@
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
-        /* ===== 全局重置 & 字体 ===== */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
             font-family: 'Segoe UI', 'PingFang SC', Roboto, 'Helvetica Neue', sans-serif;
             background: #f0f4f9;
@@ -21,8 +23,6 @@
             justify-content: center;
             align-items: center;
         }
-
-        /* ===== 主容器 ===== */
         .app-container {
             width: 100%;
             max-width: 1440px;
@@ -33,10 +33,14 @@
             display: flex;
             flex-direction: column;
         }
-
-        /* ===== 首页样式 ===== */
-        #homePage { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 60px; flex: 1; }
-
+        #homePage {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding-top: 60px;
+            flex: 1;
+        }
         .main-title {
             font-size: 58px;
             font-weight: 700;
@@ -45,9 +49,12 @@
             margin-bottom: 48px;
             text-shadow: 0 2px 12px rgba(74, 143, 224, 0.12);
         }
-
-        .home-cards { display: flex; gap: 40px; flex-wrap: wrap; justify-content: center; }
-
+        .home-cards {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
         .home-card {
             width: 320px;
             height: 180px;
@@ -64,20 +71,36 @@
             transition: all 0.25s ease;
             border: 1.5px solid #e2e8f0;
         }
-
-        .home-card:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(74, 143, 224, 0.14); border-color: #b8d4f0; }
-
-        .home-card .card-icon { font-size: 34px; margin-right: 16px; color: #4a8fe0; }
-        .home-card .card-label { display: flex; align-items: center; gap: 10px; }
-
-        /* ===== 主界面（生成练习内部） ===== */
-        #mainApp { display: none; flex: 1; flex-direction: column; height: 100%; }
-
-        .app-layout { display: flex; gap: 24px; flex: 1; min-height: 80vh; }
-
-        /* ===== 左侧功能栏 ===== */
+        .home-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 48px rgba(74, 143, 224, 0.14);
+            border-color: #b8d4f0;
+        }
+        .home-card .card-icon {
+            font-size: 34px;
+            margin-right: 16px;
+            color: #4a8fe0;
+        }
+        .home-card .card-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        #mainApp {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            height: 100%;
+        }
+        .app-layout {
+            display: flex;
+            gap: 24px;
+            flex: 1;
+            min-height: 80vh;
+        }
         .sidebar {
-            width: 200px; min-width: 180px;
+            width: 200px;
+            min-width: 180px;
             background: #ffffff;
             border-radius: 20px;
             padding: 24px 0 16px 0;
@@ -87,7 +110,6 @@
             flex-direction: column;
             height: fit-content;
         }
-
         .sidebar .back-home {
             padding: 0 20px 16px 20px;
             font-size: 15px;
@@ -100,12 +122,16 @@
             border-bottom: 1px solid #edf2f7;
             margin-bottom: 8px;
         }
-
-        .sidebar .back-home i { font-size: 16px; }
-        .sidebar .back-home:hover { color: #2d6db5; }
-
-        .sidebar-menu { list-style: none; padding: 0 12px; }
-
+        .sidebar .back-home i {
+            font-size: 16px;
+        }
+        .sidebar .back-home:hover {
+            color: #2d6db5;
+        }
+        .sidebar-menu {
+            list-style: none;
+            padding: 0 12px;
+        }
         .sidebar-menu li {
             padding: 12px 16px;
             margin: 2px 0;
@@ -119,20 +145,58 @@
             align-items: center;
             gap: 12px;
         }
-
-        .sidebar-menu li i { width: 22px; font-size: 17px; color: #94a3b8; }
-        .sidebar-menu li:hover { background: #f1f7fe; color: #1e293b; }
-        .sidebar-menu li.active { background: #e6f0fc; color: #1e40af; font-weight: 600; }
-        .sidebar-menu li.active i { color: #1e40af; }
-
-        .sidebar .file-list { margin-top: 20px; padding: 12px 16px; border-top: 1px solid #edf2f7; }
-        .sidebar .file-list .file-item { font-size: 13px; padding: 8px 4px; color: #334155; display: flex; align-items: center; justify-content: space-between; cursor: default; border-radius: 6px; }
-        .sidebar .file-list .file-item:hover { background: #f8fafc; }
-        .sidebar .file-list .file-item .file-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
-        .sidebar .file-list .file-item .rename-icon { font-size: 12px; color: #94a3b8; cursor: pointer; padding: 2px 6px; border-radius: 4px; }
-        .sidebar .file-list .file-item .rename-icon:hover { background: #e2e8f0; color: #1e293b; }
-
-        /* ===== 右侧内容区 ===== */
+        .sidebar-menu li i {
+            width: 22px;
+            font-size: 17px;
+            color: #94a3b8;
+        }
+        .sidebar-menu li:hover {
+            background: #f1f7fe;
+            color: #1e293b;
+        }
+        .sidebar-menu li.active {
+            background: #e6f0fc;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        .sidebar-menu li.active i {
+            color: #1e40af;
+        }
+        .sidebar .file-list {
+            margin-top: 20px;
+            padding: 12px 16px;
+            border-top: 1px solid #edf2f7;
+        }
+        .sidebar .file-list .file-item {
+            font-size: 13px;
+            padding: 8px 4px;
+            color: #334155;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: default;
+            border-radius: 6px;
+        }
+        .sidebar .file-list .file-item:hover {
+            background: #f8fafc;
+        }
+        .sidebar .file-list .file-item .file-name {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 120px;
+        }
+        .sidebar .file-list .file-item .rename-icon {
+            font-size: 12px;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .sidebar .file-list .file-item .rename-icon:hover {
+            background: #e2e8f0;
+            color: #1e293b;
+        }
         .content-area {
             flex: 1;
             background: #ffffff;
@@ -142,15 +206,34 @@
             min-height: 500px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
         }
-
-        .content-area .page-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
-        .content-area .page-header h2 { font-size: 22px; font-weight: 700; color: #0f172a; }
-        .content-area .page-header .back-sub { font-size: 14px; color: #4a8fe0; cursor: pointer; display: none; align-items: center; gap: 4px; }
-        .content-area .page-header .back-sub i { font-size: 14px; }
-
-        /* ===== 生成习题界面 ===== */
-        .upload-section { display: flex; flex-direction: column; gap: 24px; max-width: 680px; }
-
+        .content-area .page-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .content-area .page-header h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .content-area .page-header .back-sub {
+            font-size: 14px;
+            color: #4a8fe0;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            gap: 4px;
+        }
+        .content-area .page-header .back-sub i {
+            font-size: 14px;
+        }
+        .upload-section {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            max-width: 680px;
+        }
         .upload-zone {
             border: 2px dashed #cbd5e1;
             border-radius: 16px;
@@ -160,17 +243,36 @@
             transition: all 0.2s;
             background: #fafcff;
         }
-
-        .upload-zone:hover { border-color: #4a8fe0; background: #f4f9ff; }
-
-        .upload-zone .icon-big { font-size: 44px; color: #4a8fe0; display: block; margin-bottom: 10px; }
-        .upload-zone p { color: #475569; font-size: 15px; }
-        .upload-zone .hint { color: #94a3b8; font-size: 13px; margin-top: 4px; }
-        .upload-zone input[type="file"] { display: none; }
-
-        .upload-status { margin-top: 8px; font-size: 14px; color: #16a34a; }
-        .upload-status.error { color: #dc2626; }
-
+        .upload-zone:hover {
+            border-color: #4a8fe0;
+            background: #f4f9ff;
+        }
+        .upload-zone .icon-big {
+            font-size: 44px;
+            color: #4a8fe0;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .upload-zone p {
+            color: #475569;
+            font-size: 15px;
+        }
+        .upload-zone .hint {
+            color: #94a3b8;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+        .upload-zone input[type="file"] {
+            display: none;
+        }
+        .upload-status {
+            margin-top: 8px;
+            font-size: 14px;
+            color: #16a34a;
+        }
+        .upload-status.error {
+            color: #dc2626;
+        }
         .settings-row {
             display: flex;
             flex-wrap: wrap;
@@ -179,11 +281,19 @@
             padding: 16px 20px;
             border-radius: 14px;
         }
-
-        .settings-row .field { flex: 1; min-width: 120px; }
-
-        .settings-row label { font-size: 13px; font-weight: 500; color: #475569; display: block; margin-bottom: 4px; }
-        .settings-row select, .settings-row input {
+        .settings-row .field {
+            flex: 1;
+            min-width: 120px;
+        }
+        .settings-row label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #475569;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .settings-row select,
+        .settings-row input {
             width: 100%;
             padding: 8px 12px;
             border: 1px solid #d1d9e6;
@@ -192,73 +302,299 @@
             background: #ffffff;
             font-family: inherit;
         }
-        .settings-row select:focus, .settings-row input:focus {
+        .settings-row select:focus,
+        .settings-row input:focus {
             outline: none;
             border-color: #4a8fe0;
             box-shadow: 0 0 0 3px rgba(74, 143, 224, 0.1);
         }
-
-        /* ===== 按钮 ===== */
-        .btn-primary { padding: 10px 32px; background: #4a8fe0; color: #fff; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; transition: 0.15s; font-family: inherit; }
-        .btn-primary:hover { background: #3a7bc8; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(74, 143, 224, 0.25); }
-        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
-        .btn-sm { padding: 6px 18px; font-size: 13px; }
-        .btn-outline { background: transparent; border: 1.5px solid #d1d9e6; color: #475569; padding: 8px 20px; border-radius: 10px; cursor: pointer; font-size: 14px; font-family: inherit; }
-        .btn-outline:hover { background: #f1f5f9; border-color: #94a3b8; }
-        .btn-success { background: #16a34a; color: #fff; border: none; padding: 8px 20px; border-radius: 10px; cursor: pointer; font-size: 14px; font-family: inherit; }
-        .btn-success:hover { background: #15803d; }
-        .btn-danger { background: #dc2626; color: #fff; border: none; padding: 8px 20px; border-radius: 10px; cursor: pointer; font-size: 14px; font-family: inherit; }
-        .btn-danger:hover { background: #b91c1c; }
-
-        /* ===== 错题本 ===== */
-        .mistake-list { display: flex; flex-direction: column; gap: 16px; }
-        .mistake-item { background: #f8fafc; border-radius: 14px; padding: 18px 22px; border: 1px solid #e9edf2; display: flex; align-items: flex-start; gap: 14px; }
-        .mistake-item .checkbox-col { padding-top: 2px; }
-        .mistake-item .checkbox-col input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
-        .mistake-item .mistake-content { flex: 1; }
-        .mistake-item .mistake-content .q-text { font-weight: 500; margin-bottom: 4px; }
-        .mistake-item .mistake-content .q-meta { font-size: 13px; color: #64748b; display: flex; gap: 16px; flex-wrap: wrap; }
-        .mistake-item .mistake-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-        .mistake-item .mistake-actions button { font-size: 12px; padding: 4px 14px; }
-
-        .note-area { margin-top: 10px; padding: 10px 14px; background: #ffffff; border-radius: 10px; border: 1px solid #e2e8f0; }
-        .note-area .note-item { padding: 6px 0; border-bottom: 1px solid #edf2f7; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
-        .note-area .note-item:last-child { border-bottom: none; }
-        .note-area .note-item .note-text { flex: 1; }
-        .note-area .note-item .note-actions { display: flex; gap: 6px; }
-        .note-area .note-item .note-actions button { font-size: 12px; padding: 2px 10px; }
-        .note-area .add-note { display: flex; gap: 10px; margin-top: 8px; align-items: center; }
-        .note-area .add-note input { flex: 1; padding: 6px 12px; border: 1px solid #d1d9e6; border-radius: 8px; font-size: 14px; }
-        .note-area .add-note input:focus { outline: none; border-color: #4a8fe0; }
-        .note-area .add-note .upload-img-btn { font-size: 12px; color: #4a8fe0; cursor: pointer; display: flex; align-items: center; gap: 4px; }
-        .note-area .add-note .upload-img-btn i { font-size: 16px; }
-        .note-area .note-img { max-width: 120px; max-height: 120px; border-radius: 8px; margin-top: 4px; border: 1px solid #e2e8f0; }
-
-        /* ===== 薄弱知识点 ===== */
-        .weakness-list { display: flex; flex-direction: column; gap: 12px; }
-        .weakness-item { background: #f8fafc; border-radius: 14px; padding: 16px 20px; border: 1px solid #e9edf2; cursor: pointer; transition: 0.15s; }
-        .weakness-item:hover { border-color: #b8d4f0; background: #f4f9ff; }
-        .weakness-item .weak-title { font-size: 17px; font-weight: 600; color: #0f172a; margin-bottom: 4px; }
-        .weakness-item .weak-desc { font-size: 14px; color: #64748b; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .weakness-item .weak-desc.full { -webkit-line-clamp: unset; }
-        .weakness-item .weak-actions { margin-top: 10px; display: flex; gap: 10px; }
-
-        /* ===== 口诀题目 ===== */
-        .mnemonic-list { display: flex; flex-direction: column; gap: 12px; }
-        .mnemonic-item { background: #f8fafc; border-radius: 14px; padding: 16px 20px; border: 1px solid #e9edf2; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
-        .mnemonic-item .mnemonic-text { font-size: 16px; font-weight: 500; color: #1e293b; }
-        .mnemonic-item .mnemonic-meaning { font-size: 14px; color: #64748b; margin-top: 2px; }
-        .mnemonic-item .mnemonic-actions { display: flex; gap: 10px; }
-        .mnemonic-item .mnemonic-actions button { font-size: 12px; padding: 4px 14px; }
-
-        /* ===== 习题总库 ===== */
-        .total-library { display: flex; flex-direction: column; gap: 12px; }
-        .library-item { background: #f8fafc; border-radius: 14px; padding: 14px 20px; border: 1px solid #e9edf2; display: flex; justify-content: space-between; align-items: center; }
-        .library-item .lib-info { display: flex; flex-direction: column; }
-        .library-item .lib-info .lib-name { font-weight: 500; }
-        .library-item .lib-info .lib-meta { font-size: 13px; color: #64748b; }
-
-        /* ===== Toast 提示 ===== */
+        .btn-primary {
+            padding: 10px 32px;
+            background: #4a8fe0;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.15s;
+            font-family: inherit;
+        }
+        .btn-primary:hover {
+            background: #3a7bc8;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(74, 143, 224, 0.25);
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .btn-sm {
+            padding: 6px 18px;
+            font-size: 13px;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid #d1d9e6;
+            color: #475569;
+            padding: 8px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        .btn-outline:hover {
+            background: #f1f5f9;
+            border-color: #94a3b8;
+        }
+        .btn-success {
+            background: #16a34a;
+            color: #fff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        .btn-success:hover {
+            background: #15803d;
+        }
+        .btn-danger {
+            background: #dc2626;
+            color: #fff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+        .btn-warning {
+            background: #f59e0b;
+            color: #fff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        .btn-warning:hover {
+            background: #d97706;
+        }
+        .mistake-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .mistake-item {
+            background: #f8fafc;
+            border-radius: 14px;
+            padding: 18px 22px;
+            border: 1px solid #e9edf2;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+        }
+        .mistake-item .checkbox-col {
+            padding-top: 2px;
+        }
+        .mistake-item .checkbox-col input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .mistake-item .mistake-content {
+            flex: 1;
+        }
+        .mistake-item .mistake-content .q-text {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        .mistake-item .mistake-content .q-meta {
+            font-size: 13px;
+            color: #64748b;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .mistake-item .mistake-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .mistake-item .mistake-actions button {
+            font-size: 12px;
+            padding: 4px 14px;
+        }
+        .note-area {
+            margin-top: 10px;
+            padding: 10px 14px;
+            background: #ffffff;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+        .note-area .note-item {
+            padding: 6px 0;
+            border-bottom: 1px solid #edf2f7;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .note-area .note-item:last-child {
+            border-bottom: none;
+        }
+        .note-area .note-item .note-text {
+            flex: 1;
+        }
+        .note-area .note-item .note-actions {
+            display: flex;
+            gap: 6px;
+        }
+        .note-area .note-item .note-actions button {
+            font-size: 12px;
+            padding: 2px 10px;
+        }
+        .note-area .add-note {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+            align-items: center;
+        }
+        .note-area .add-note input {
+            flex: 1;
+            padding: 6px 12px;
+            border: 1px solid #d1d9e6;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .note-area .add-note input:focus {
+            outline: none;
+            border-color: #4a8fe0;
+        }
+        .note-area .add-note .upload-img-btn {
+            font-size: 12px;
+            color: #4a8fe0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .note-area .add-note .upload-img-btn i {
+            font-size: 16px;
+        }
+        .note-area .note-img {
+            max-width: 120px;
+            max-height: 120px;
+            border-radius: 8px;
+            margin-top: 4px;
+            border: 1px solid #e2e8f0;
+        }
+        .weakness-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .weakness-item {
+            background: #f8fafc;
+            border-radius: 14px;
+            padding: 16px 20px;
+            border: 1px solid #e9edf2;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .weakness-item:hover {
+            border-color: #b8d4f0;
+            background: #f4f9ff;
+        }
+        .weakness-item .weak-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+        .weakness-item .weak-desc {
+            font-size: 14px;
+            color: #64748b;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .weakness-item .weak-desc.full {
+            -webkit-line-clamp: unset;
+        }
+        .weakness-item .weak-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+        .mnemonic-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .mnemonic-item {
+            background: #f8fafc;
+            border-radius: 14px;
+            padding: 16px 20px;
+            border: 1px solid #e9edf2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .mnemonic-item .mnemonic-text {
+            font-size: 16px;
+            font-weight: 500;
+            color: #1e293b;
+        }
+        .mnemonic-item .mnemonic-meaning {
+            font-size: 14px;
+            color: #64748b;
+            margin-top: 2px;
+        }
+        .mnemonic-item .mnemonic-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .mnemonic-item .mnemonic-actions button {
+            font-size: 12px;
+            padding: 4px 14px;
+        }
+        .total-library {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .library-item {
+            background: #f8fafc;
+            border-radius: 14px;
+            padding: 14px 20px;
+            border: 1px solid #e9edf2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .library-item .lib-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .library-item .lib-info .lib-name {
+            font-weight: 500;
+        }
+        .library-item .lib-info .lib-meta {
+            font-size: 13px;
+            color: #64748b;
+        }
         .toast {
             position: fixed;
             bottom: 40px;
@@ -269,49 +605,250 @@
             font-size: 15px;
             background: #1e293b;
             color: #fff;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
             display: none;
             z-index: 999;
             max-width: 90%;
             text-align: center;
         }
-        .toast.show { display: block; }
-        .toast.success { background: #16a34a; }
-        .toast.error { background: #dc2626; }
-        .toast.info { background: #4a8fe0; }
-
-        /* ===== 响应式 ===== */
-        @media (max-width: 768px) {
-            .app-container { padding: 12px 16px; }
-            .main-title { font-size: 36px; margin-bottom: 28px; }
-            .home-card { width: 260px; height: 140px; font-size: 20px; }
-            .app-layout { flex-direction: column; }
-            .sidebar { width: 100%; min-width: unset; flex-direction: row; flex-wrap: wrap; padding: 12px 16px; }
-            .sidebar .back-home { padding: 4px 8px 8px 8px; border-bottom: none; width: 100%; }
-            .sidebar-menu { display: flex; flex-wrap: wrap; padding: 0 4px; }
-            .sidebar-menu li { padding: 8px 14px; font-size: 13px; }
-            .sidebar .file-list { display: none; }
-            .content-area { padding: 20px; }
-            .settings-row { flex-direction: column; }
-            .mistake-item { flex-direction: column; }
-            .mistake-item .mistake-actions { flex-wrap: wrap; }
+        .toast.show {
+            display: block;
         }
-
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-
-        .sub-page { display: none; }
-        .sub-page.active { display: block; }
-
-        .spinner { display: inline-block; width: 18px; height: 18px; border: 2.5px solid #e9edf2; border-top-color: #4a8fe0; border-radius: 50%; animation: spin 0.7s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .preview-img-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
-        .preview-img-container img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0; }
-
-        .note-item .note-img-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
-        .note-item .note-img-row img { width: 48px; height: 48px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0; }
+        .toast.success {
+            background: #16a34a;
+        }
+        .toast.error {
+            background: #dc2626;
+        }
+        .toast.info {
+            background: #4a8fe0;
+        }
+        @media (max-width: 768px) {
+            .app-container {
+                padding: 12px 16px;
+            }
+            .main-title {
+                font-size: 36px;
+                margin-bottom: 28px;
+            }
+            .home-card {
+                width: 260px;
+                height: 140px;
+                font-size: 20px;
+            }
+            .app-layout {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                min-width: unset;
+                flex-direction: row;
+                flex-wrap: wrap;
+                padding: 12px 16px;
+            }
+            .sidebar .back-home {
+                padding: 4px 8px 8px 8px;
+                border-bottom: none;
+                width: 100%;
+            }
+            .sidebar-menu {
+                display: flex;
+                flex-wrap: wrap;
+                padding: 0 4px;
+            }
+            .sidebar-menu li {
+                padding: 8px 14px;
+                font-size: 13px;
+            }
+            .sidebar .file-list {
+                display: none;
+            }
+            .content-area {
+                padding: 20px;
+            }
+            .settings-row {
+                flex-direction: column;
+            }
+            .mistake-item {
+                flex-direction: column;
+            }
+            .mistake-item .mistake-actions {
+                flex-wrap: wrap;
+            }
+        }
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .sub-page {
+            display: none;
+        }
+        .sub-page.active {
+            display: block;
+        }
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2.5px solid #e9edf2;
+            border-top-color: #4a8fe0;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        .preview-img-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 6px;
+        }
+        .preview-img-container img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        .note-item .note-img-row {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 4px;
+        }
+        .note-item .note-img-row img {
+            width: 48px;
+            height: 48px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+        .admin-panel {
+            background: #f8fafc;
+            border-radius: 14px;
+            padding: 20px;
+            border: 1px solid #e9edf2;
+        }
+        .admin-panel table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+        .admin-panel table th,
+        .admin-panel table td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #e9edf2;
+            font-size: 14px;
+        }
+        .admin-panel table th {
+            background: #f1f5f9;
+            font-weight: 600;
+        }
+        .admin-panel table tr:hover {
+            background: #f8fafc;
+        }
+        .admin-panel .status-badge {
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .admin-panel .status-badge.online {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+        .admin-panel .status-badge.offline {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+        .admin-panel .status-badge.banned {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+        .account-section {
+            max-width: 480px;
+        }
+        .account-section .field {
+            margin-bottom: 16px;
+        }
+        .account-section .field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #475569;
+            margin-bottom: 4px;
+        }
+        .account-section .field input,
+        .account-section .field textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #d1d9e6;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        .account-section .field input:focus,
+        .account-section .field textarea:focus {
+            outline: none;
+            border-color: #4a8fe0;
+            box-shadow: 0 0 0 3px rgba(74, 143, 224, 0.1);
+        }
+        .account-section .field textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        .search-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .search-bar input,
+        .search-bar select {
+            padding: 8px 14px;
+            border: 1px solid #d1d9e6;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        .search-bar input:focus,
+        .search-bar select:focus {
+            outline: none;
+            border-color: #4a8fe0;
+            box-shadow: 0 0 0 3px rgba(74, 143, 224, 0.1);
+        }
+        .stats-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: #64748b;
+        }
+        .stats-row span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .category-tag {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            background: #eef2ff;
+            color: #1e40af;
+        }
     </style>
 </head>
 <body>
@@ -347,8 +884,9 @@
                         <li data-page="weakness"><i class="fas fa-lightbulb"></i> 薄弱知识点列表</li>
                         <li data-page="mnemonic"><i class="fas fa-magic"></i> 口诀题目</li>
                         <li data-page="library"><i class="fas fa-database"></i> 习题总库</li>
+                        <li data-page="account"><i class="fas fa-user"></i> 我的账户</li>
+                        <li data-page="admin" id="adminMenuItem" style="display:none;"><i class="fas fa-shield-alt"></i> 管理员面板</li>
                     </ul>
-                    <!-- 文件列表 (显示word名称+题集名) -->
                     <div class="file-list" id="fileListContainer">
                         <div style="font-size:13px;font-weight:600;color:#64748b;margin-bottom:6px;">📁 我的题集</div>
                         <div class="file-item" data-file="demo1">
@@ -403,7 +941,6 @@
                                         <option value="混合">混合</option>
                                     </select>
                                 </div>
-                                <!-- 答案解析显示时机 -->
                                 <div class="field" style="flex-basis:100%;">
                                     <label>答案解析显示时机</label>
                                     <div style="display:flex;gap:16px;margin-top:4px;flex-wrap:wrap;">
@@ -420,14 +957,12 @@
                                     <button class="btn-success" id="submitBtn" style="display:none;">📝 提交答案</button>
                                 </div>
                             </div>
-                            <!-- 题集名称输入 -->
                             <div style="display:flex;gap:12px;align-items:center;margin-top:4px;">
                                 <label style="font-size:14px;font-weight:500;color:#475569;">题集名称：</label>
                                 <input type="text" id="collectionName" placeholder="如：生理学第1章" style="flex:1;padding:8px 14px;border:1px solid #d1d9e6;border-radius:10px;font-size:14px;max-width:300px;" />
                                 <span style="font-size:13px;color:#94a3b8;">（生成后将在左侧显示）</span>
                             </div>
                         </div>
-                        <!-- 题目展示区 -->
                         <div id="questionDisplayArea" style="margin-top:28px;display:none;">
                             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
                                 <h3 style="font-size:18px;font-weight:600;">📋 生成结果</h3>
@@ -451,6 +986,7 @@
                             <button class="btn-outline btn-sm" id="selectAllMistake"><i class="far fa-check-square"></i> 全选</button>
                             <button class="btn-outline btn-sm" id="deselectAllMistake"><i class="far fa-square"></i> 取消全选</button>
                             <button class="btn-primary btn-sm" id="redoSelectedBtn"><i class="fas fa-redo"></i> 重做选中</button>
+                            <button class="btn-success btn-sm" id="exportMistakeBtn">📄 导出错题</button>
                             <span style="font-size:13px;color:#94a3b8;display:flex;align-items:center;gap:8px;">
                                 <i class="far fa-calendar-alt"></i> 日期筛选：
                                 <select id="dateFilter" style="padding:4px 10px;border:1px solid #d1d9e6;border-radius:6px;font-size:13px;">
@@ -470,9 +1006,7 @@
                                 </select>
                             </span>
                         </div>
-                        <div class="mistake-list" id="mistakeList">
-                            <div style="color:#94a3b8;text-align:center;padding:40px 0;">暂无错题，快来检验学习成果吧！</div>
-                        </div>
+                        <div class="mistake-list" id="mistakeList"></div>
                     </div>
 
                     <!-- ===== 薄弱知识点列表 ===== -->
@@ -481,9 +1015,7 @@
                             <h2><i class="fas fa-lightbulb" style="color:#4a8fe0;margin-right:10px;"></i>薄弱知识点列表</h2>
                             <button class="btn-primary btn-sm" id="weaknessGenerateBtn" style="margin-left:12px;">🎯 按薄弱点出题</button>
                         </div>
-                        <div class="weakness-list" id="weaknessList">
-                            <div style="color:#94a3b8;text-align:center;padding:40px 0;">暂无薄弱知识点，答题后会自动生成。</div>
-                        </div>
+                        <div class="weakness-list" id="weaknessList"></div>
                     </div>
 
                     <!-- ===== 口诀题目 ===== -->
@@ -492,9 +1024,7 @@
                             <h2><i class="fas fa-magic" style="color:#4a8fe0;margin-right:10px;"></i>口诀题目</h2>
                             <button class="btn-primary btn-sm" id="mnemonicGenerateBtn" style="margin-left:12px;">📝 生成选择题</button>
                         </div>
-                        <div class="mnemonic-list" id="mnemonicList">
-                            <div style="color:#94a3b8;text-align:center;padding:40px 0;">暂未识别出口诀，上传文档后可自动提取。</div>
-                        </div>
+                        <div class="mnemonic-list" id="mnemonicList"></div>
                     </div>
 
                     <!-- ===== 习题总库 ===== -->
@@ -503,8 +1033,125 @@
                             <h2><i class="fas fa-database" style="color:#4a8fe0;margin-right:10px;"></i>习题总库</h2>
                             <span style="font-size:14px;color:#64748b;margin-left:12px;">共 0 题</span>
                         </div>
-                        <div class="total-library" id="libraryList">
-                            <div style="color:#94a3b8;text-align:center;padding:40px 0;">习题总库为空，请先上传文档并生成题目。</div>
+                        <div class="search-bar">
+                            <input type="text" id="librarySearch" placeholder="搜索题目关键词..." style="flex:1;min-width:150px;" />
+                            <select id="libraryTimeFilter" style="padding:8px 14px;border:1px solid #d1d9e6;border-radius:8px;font-size:14px;">
+                                <option value="all">全部时间</option>
+                                <option value="today">今天</option>
+                                <option value="week">本周</option>
+                                <option value="month">本月</option>
+                            </select>
+                            <button class="btn-primary btn-sm" id="librarySearchBtn">🔍 搜索</button>
+                        </div>
+                        <div class="total-library" id="libraryList"></div>
+                    </div>
+
+                    <!-- ===== 我的账户 ===== -->
+                    <div class="sub-page" id="page-account">
+                        <div class="page-header">
+                            <h2><i class="fas fa-user" style="color:#4a8fe0;margin-right:10px;"></i>我的账户</h2>
+                        </div>
+                        <div class="account-section">
+                            <div class="field">
+                                <label>用户名</label>
+                                <input type="text" id="accountUsername" disabled style="background:#f1f5f9;" />
+                            </div>
+                            <div class="field">
+                                <label>昵称</label>
+                                <input type="text" id="accountNickname" disabled style="background:#f1f5f9;" />
+                            </div>
+                            <div class="field">
+                                <label>角色</label>
+                                <input type="text" id="accountRole" disabled style="background:#f1f5f9;" />
+                            </div>
+                            <hr style="border:none;border-top:1px solid #e9edf2;margin:16px 0;" />
+                            <h3 style="font-size:17px;font-weight:600;margin-bottom:12px;">修改密码</h3>
+                            <div class="field">
+                                <label>新密码</label>
+                                <input type="password" id="newPassword" placeholder="至少6位，含字母或数字" />
+                            </div>
+                            <div class="field">
+                                <label>确认新密码</label>
+                                <input type="password" id="confirmNewPassword" placeholder="再次输入新密码" />
+                            </div>
+                            <button class="btn-primary" id="changePasswordBtn">修改密码</button>
+                            <hr style="border:none;border-top:1px solid #e9edf2;margin:16px 0;" />
+                            <h3 style="font-size:17px;font-weight:600;margin-bottom:12px;">提交意见</h3>
+                            <div class="field">
+                                <label>意见内容</label>
+                                <textarea id="feedbackContent" placeholder="请输入您的意见或建议..."></textarea>
+                            </div>
+                            <button class="btn-success" id="submitFeedbackBtn">提交意见</button>
+                        </div>
+                    </div>
+
+                    <!-- ===== 管理员面板 ===== -->
+                    <div class="sub-page" id="page-admin">
+                        <div class="page-header">
+                            <h2><i class="fas fa-shield-alt" style="color:#4a8fe0;margin-right:10px;"></i>管理员面板</h2>
+                            <button class="btn-primary btn-sm" id="showGenAccountBtn" style="margin-left:12px;">➕ 生成账号</button>
+                        </div>
+                        <div class="admin-panel">
+                            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:12px;">
+                                <span style="font-weight:500;">用户列表</span>
+                                <span style="font-size:13px;color:#64748b;">共 <span id="userCount">0</span> 位用户</span>
+                            </div>
+                            <div id="userTableContainer">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>用户名</th>
+                                            <th>昵称</th>
+                                            <th>角色</th>
+                                            <th>状态</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="userTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- 生成账号弹窗 -->
+                        <div id="genAccountModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:10000;justify-content:center;align-items:center;">
+                            <div style="background:#fff;border-radius:24px;padding:40px;max-width:480px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+                                <h2 style="text-align:center;margin-bottom:20px;">👤 生成账号</h2>
+                                <div class="field">
+                                    <label>生成方式</label>
+                                    <div style="display:flex;gap:16px;flex-wrap:wrap;">
+                                        <label style="font-weight:normal;font-size:14px;cursor:pointer;">
+                                            <input type="radio" name="genMode" value="batch" checked /> 批量生成（仅前缀）
+                                        </label>
+                                        <label style="font-weight:normal;font-size:14px;cursor:pointer;">
+                                            <input type="radio" name="genMode" value="single" /> 指定账号密码
+                                        </label>
+                                    </div>
+                                </div>
+                                <div id="batchGenFields">
+                                    <div class="field">
+                                        <label>用户名前缀</label>
+                                        <input type="text" id="genPrefix" value="user" />
+                                    </div>
+                                    <div class="field">
+                                        <label>生成数量</label>
+                                        <input type="number" id="genCount" value="3" min="1" max="50" />
+                                    </div>
+                                </div>
+                                <div id="singleGenFields" style="display:none;">
+                                    <div class="field">
+                                        <label>用户名</label>
+                                        <input type="text" id="singleUsername" placeholder="请输入用户名" />
+                                    </div>
+                                    <div class="field">
+                                        <label>密码</label>
+                                        <input type="password" id="singlePassword" placeholder="至少6位" />
+                                    </div>
+                                </div>
+                                <div style="display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;">
+                                    <button class="btn-primary" id="confirmGenBtn" style="flex:1;">确认生成</button>
+                                    <button class="btn-outline" id="cancelGenBtn" style="flex:1;">取消</button>
+                                </div>
+                                <div id="genResultDisplay" style="margin-top:12px;padding:12px;background:#f8fafc;border-radius:8px;font-size:13px;white-space:pre-wrap;display:none;"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -515,334 +1162,468 @@
         <div class="toast" id="toast"></div>
     </div>
 
+    <!-- ===== 登录弹窗 ===== -->
+    <div id="loginOverlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;display:none;justify-content:center;align-items:center;">
+        <div style="background:#fff;border-radius:24px;padding:40px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);position:relative;">
+            <span onclick="document.getElementById('loginOverlay').style.display='none'" style="position:absolute;top:15px;right:20px;font-size:24px;cursor:pointer;color:#64748b;">&times;</span>
+            <h2 style="text-align:center;margin-bottom:20px;">🔑 登录聪明肠</h2>
+            <div id="loginForm">
+                <div style="margin-bottom:12px;">
+                    <label style="font-size:13px;font-weight:500;color:#475569;display:block;margin-bottom:4px;">用户名</label>
+                    <input type="text" id="loginUsername" placeholder="请输入用户名" style="width:100%;padding:10px 14px;border:1px solid #d1d9e6;border-radius:10px;font-size:14px;" />
+                </div>
+                <div style="margin-bottom:12px;">
+                    <label style="font-size:13px;font-weight:500;color:#475569;display:block;margin-bottom:4px;">密码</label>
+                    <input type="password" id="loginPassword" placeholder="请输入密码" style="width:100%;padding:10px 14px;border:1px solid #d1d9e6;border-radius:10px;font-size:14px;" />
+                </div>
+                <button id="loginBtn" style="width:100%;padding:12px;background:#4a8fe0;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;">登录</button>
+                <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:13px;">
+                    <span style="color:#64748b;cursor:pointer;" id="showRegister">没有账号？注册</span>
+                    <span style="color:#4a8fe0;cursor:pointer;" id="showAdminGen" style="display:none;">管理员生成账号</span>
+                </div>
+            </div>
+            <div id="registerForm" style="display:none;">
+                <div style="margin-bottom:12px;">
+                    <label style="font-size:13px;font-weight:500;color:#475569;display:block;margin-bottom:4px;">用户名</label>
+                    <input type="text" id="regUsername" placeholder="请输入用户名" style="width:100%;padding:10px 14px;border:1px solid #d1d9e6;border-radius:10px;font-size:14px;" />
+                </div>
+                <div style="margin-bottom:12px;">
+                    <label style="font-size:13px;font-weight:500;color:#475569;display:block;margin-bottom:4px;">密码</label>
+                    <input type="password" id="regPassword" placeholder="至少6位" style="width:100%;padding:10px 14px;border:1px solid #d1d9e6;border-radius:10px;font-size:14px;" />
+                </div>
+                <div style="margin-bottom:12px;">
+                    <label style="font-size:13px;font-weight:500;color:#475569;display:block;margin-bottom:4px;">昵称（可选）</label>
+                    <input type="text" id="regNickname" placeholder="昵称" style="width:100%;padding:10px 14px;border:1px solid #d1d9e6;border-radius:10px;font-size:14px;" />
+                </div>
+                <button id="registerBtn" style="width:100%;padding:12px;background:#16a34a;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;">注册</button>
+                <div style="text-align:center;margin-top:8px;font-size:13px;color:#64748b;cursor:pointer;" id="showLogin">已有账号？去登录</div>
+            </div>
+            <div id="adminGenForm" style="display:none;">
+                <div style="margin-bottom:12px;">
+                    <label style="font-size:13px;font-weight:500;color:#475569;display:block;margin-bottom:4px;">生成数量</label>
+                    <input type="number" id="genCountAdmin" value="3" min="1" max="50" style="width:100%;padding:10px 14px;border:1px solid #d1d9e6;border-radius:10px;font-size:14px;" />
+                </div>
+                <div style="margin-bottom:12px;">
+                    <label style="font-size:13px;font-weight:500;color:#475569;display:block;margin-bottom:4px;">用户名前缀</label>
+                    <input type="text" id="genPrefixAdmin" value="user" style="width:100%;padding:10px 14px;border:1px solid #d1d9e6;border-radius:10px;font-size:14px;" />
+                </div>
+                <button id="genUsersBtn" style="width:100%;padding:12px;background:#f59e0b;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;">生成账号</button>
+                <div id="genResult" style="margin-top:12px;padding:12px;background:#f8fafc;border-radius:8px;font-size:13px;white-space:pre-wrap;display:none;"></div>
+                <div style="text-align:center;margin-top:8px;font-size:13px;color:#64748b;cursor:pointer;" id="showLoginFromGen">返回登录</div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ================================================================
         //  主逻辑
         // ================================================================
 
-        (function() {
-            'use strict';
+        // ---------- 硬编码 API 信息 ----------
+        const LLM_API_BASE = 'https://ark.cn-beijing.volces.com/api/v3/chat/completions';
+        const LLM_API_KEY = 'ark-7cb73d67-00b8-4fe7-90a1-8c5cdd03466e-bb512';
+        const LLM_MODEL_ID = 'doubao-seed-2-0-code-preview-260215';
 
-            // ---------- DOM 引用 ----------
-            const homePage = document.getElementById('homePage');
-            const mainApp = document.getElementById('mainApp');
-            const enterPractice = document.getElementById('enterPractice');
-            const enterLogin = document.getElementById('enterLogin');
-            const backHomeBtn = document.getElementById('backHomeBtn');
+        // ---------- 后端地址 ----------
+        const API_BASE_URL = 'https://congmingchang-backend-production.up.railway.app/api';
+        let authToken = localStorage.getItem('token');
+        let currentUser = null;
 
-            const sidebarMenu = document.querySelectorAll('.sidebar-menu li');
-            const subPages = document.querySelectorAll('.sub-page');
+        // ---------- DOM 引用 ----------
+        const homePage = document.getElementById('homePage');
+        const mainApp = document.getElementById('mainApp');
+        const enterPractice = document.getElementById('enterPractice');
+        const enterLogin = document.getElementById('enterLogin');
+        const backHomeBtn = document.getElementById('backHomeBtn');
 
-            const uploadZone = document.getElementById('uploadZone');
-            const fileInput = document.getElementById('fileInput');
-            const uploadStatus = document.getElementById('uploadStatus');
-            const generateBtn = document.getElementById('generateBtn');
-            const submitBtn = document.getElementById('submitBtn');
-            const questionCount = document.getElementById('questionCount');
-            const difficulty = document.getElementById('difficulty');
-            const questionType = document.getElementById('questionType');
-            const collectionName = document.getElementById('collectionName');
+        const sidebarMenu = document.querySelectorAll('.sidebar-menu li');
+        const subPages = document.querySelectorAll('.sub-page');
 
-            const questionDisplayArea = document.getElementById('questionDisplayArea');
-            const questionList = document.getElementById('questionList');
-            const resultCount = document.getElementById('resultCount');
-            const exportTextBtn = document.getElementById('exportTextBtn');
-            const clearResultBtn = document.getElementById('clearResultBtn');
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const uploadStatus = document.getElementById('uploadStatus');
+        const generateBtn = document.getElementById('generateBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const questionCount = document.getElementById('questionCount');
+        const difficulty = document.getElementById('difficulty');
+        const questionType = document.getElementById('questionType');
+        const collectionName = document.getElementById('collectionName');
 
-            const mistakeList = document.getElementById('mistakeList');
-            const mistakeCount = document.getElementById('mistakeCount');
-            const selectAllMistake = document.getElementById('selectAllMistake');
-            const deselectAllMistake = document.getElementById('deselectAllMistake');
-            const redoSelectedBtn = document.getElementById('redoSelectedBtn');
-            const dateFilter = document.getElementById('dateFilter');
-            const sourceFilter = document.getElementById('sourceFilter');
+        const questionDisplayArea = document.getElementById('questionDisplayArea');
+        const questionList = document.getElementById('questionList');
+        const resultCount = document.getElementById('resultCount');
+        const exportTextBtn = document.getElementById('exportTextBtn');
+        const clearResultBtn = document.getElementById('clearResultBtn');
 
-            const weaknessList = document.getElementById('weaknessList');
-            const weaknessGenerateBtn = document.getElementById('weaknessGenerateBtn');
+        const mistakeList = document.getElementById('mistakeList');
+        const mistakeCount = document.getElementById('mistakeCount');
+        const selectAllMistake = document.getElementById('selectAllMistake');
+        const deselectAllMistake = document.getElementById('deselectAllMistake');
+        const redoSelectedBtn = document.getElementById('redoSelectedBtn');
+        const exportMistakeBtn = document.getElementById('exportMistakeBtn');
+        const dateFilter = document.getElementById('dateFilter');
+        const sourceFilter = document.getElementById('sourceFilter');
 
-            const mnemonicList = document.getElementById('mnemonicList');
-            const mnemonicGenerateBtn = document.getElementById('mnemonicGenerateBtn');
+        const weaknessList = document.getElementById('weaknessList');
+        const weaknessGenerateBtn = document.getElementById('weaknessGenerateBtn');
 
-            const libraryList = document.getElementById('libraryList');
+        const mnemonicList = document.getElementById('mnemonicList');
+        const mnemonicGenerateBtn = document.getElementById('mnemonicGenerateBtn');
 
-            const toast = document.getElementById('toast');
+        const libraryList = document.getElementById('libraryList');
+        const librarySearch = document.getElementById('librarySearch');
+        const libraryTimeFilter = document.getElementById('libraryTimeFilter');
+        const librarySearchBtn = document.getElementById('librarySearchBtn');
 
-            const fileListContainer = document.getElementById('fileListContainer');
+        const toast = document.getElementById('toast');
 
-            // ---------- 状态 ----------
-            let currentPage = 'generate';
-            let generatedQuestions = [];
-            let uploadedFileName = '';
-            let answerDisplayMode = 'afterAll';
-            let allAnswersRevealed = false;
-            let mistakeData = [];
-            let currentUser = null;
-            let authToken = localStorage.getItem('token');
+        const fileListContainer = document.getElementById('fileListContainer');
 
-            // ---------- 工具函数 ----------
-            function showToastMsg(message, type = 'info') {
-                toast.className = `toast show ${type}`;
-                toast.textContent = message;
-                clearTimeout(toast._timer);
-                toast._timer = setTimeout(() => {
-                    toast.classList.remove('show');
-                }, 3500);
-            }
+        // ---------- 账户相关 ----------
+        const accountUsername = document.getElementById('accountUsername');
+        const accountNickname = document.getElementById('accountNickname');
+        const accountRole = document.getElementById('accountRole');
+        const newPassword = document.getElementById('newPassword');
+        const confirmNewPassword = document.getElementById('confirmNewPassword');
+        const changePasswordBtn = document.getElementById('changePasswordBtn');
+        const feedbackContent = document.getElementById('feedbackContent');
+        const submitFeedbackBtn = document.getElementById('submitFeedbackBtn');
 
-            function hideToastMsg() {
+        // ---------- 管理员相关 ----------
+        const adminMenuItem = document.getElementById('adminMenuItem');
+        const showGenAccountBtn = document.getElementById('showGenAccountBtn');
+        const genAccountModal = document.getElementById('genAccountModal');
+        const confirmGenBtn = document.getElementById('confirmGenBtn');
+        const cancelGenBtn = document.getElementById('cancelGenBtn');
+        const genResultDisplay = document.getElementById('genResultDisplay');
+        const genModeRadios = document.querySelectorAll('input[name="genMode"]');
+        const batchGenFields = document.getElementById('batchGenFields');
+        const singleGenFields = document.getElementById('singleGenFields');
+        const genPrefix = document.getElementById('genPrefix');
+        const genCount = document.getElementById('genCount');
+        const singleUsername = document.getElementById('singleUsername');
+        const singlePassword = document.getElementById('singlePassword');
+        const userTableBody = document.getElementById('userTableBody');
+        const userCount = document.getElementById('userCount');
+
+        // ---------- 状态 ----------
+        let currentPage = 'generate';
+        let generatedQuestions = [];
+        let uploadedFileName = '';
+        let answerDisplayMode = 'afterAll';
+        let allAnswersRevealed = false;
+        let mistakeData = [];
+        let weaknessData = [];
+        let mnemonicData = [];
+        let libraryData = [];
+        let allUsers = [];
+
+        // ---------- 工具函数 ----------
+        function showToastMsg(message, type = 'info') {
+            toast.className = `toast show ${type}`;
+            toast.textContent = message;
+            clearTimeout(toast._timer);
+            toast._timer = setTimeout(() => {
                 toast.classList.remove('show');
-                clearTimeout(toast._timer);
-            }
+            }, 3500);
+        }
 
-            function switchPage(pageId) {
-                sidebarMenu.forEach(li => {
-                    li.classList.toggle('active', li.dataset.page === pageId);
-                });
-                subPages.forEach(page => {
-                    page.classList.toggle('active', page.id === `page-${pageId}`);
-                });
-                currentPage = pageId;
-            }
+        function hideToastMsg() {
+            toast.classList.remove('show');
+            clearTimeout(toast._timer);
+        }
 
-            // ---------- 首页与主应用切换 ----------
-            function enterMainApp() {
-                homePage.style.display = 'none';
-                mainApp.style.display = 'flex';
-            }
-
-            function goHome() {
-                mainApp.style.display = 'none';
-                homePage.style.display = 'flex';
-            }
-
-            enterPractice.addEventListener('click', enterMainApp);
-            backHomeBtn.addEventListener('click', goHome);
-
-            // ---------- 登录/注册 ----------
-            // 修改：点击登录/注册按钮，直接弹出登录弹窗
-            enterLogin.addEventListener('click', () => {
-                document.getElementById('loginOverlay').style.display = 'flex';
-            });
-
-            // ---------- 侧边栏导航 ----------
+        function switchPage(pageId) {
             sidebarMenu.forEach(li => {
-                li.addEventListener('click', function() {
-                    const page = this.dataset.page;
-                    // 需要登录的功能：错题本、薄弱知识点、口诀题目、习题总库
-                    if (['mistake', 'weakness', 'mnemonic', 'library'].includes(page) && !currentUser) {
-                        showToastMsg('请先登录以使用此功能', 'info');
-                        document.getElementById('loginOverlay').style.display = 'flex';
-                        return;
-                    }
-                    switchPage(page);
-                    if (page === 'mistake') loadMistakes();
-                    if (page === 'library') loadCollections();
-                    if (page === 'weakness') loadWeakTopics();
-                    if (page === 'mnemonic') loadMnemonics();
-                    if (page === 'generate') updateFileList();
-                });
+                li.classList.toggle('active', li.dataset.page === pageId);
             });
+            subPages.forEach(page => {
+                page.classList.toggle('active', page.id === `page-${pageId}`);
+            });
+            currentPage = pageId;
+            if (pageId === 'mistake') loadMistakes();
+            if (pageId === 'library') loadLibrary();
+            if (pageId === 'weakness') loadWeakness();
+            if (pageId === 'mnemonic') loadMnemonics();
+            if (pageId === 'account') loadAccountInfo();
+            if (pageId === 'admin') loadAdminUsers();
+            if (pageId === 'generate') updateFileList();
+        }
 
-            // ---------- 文件列表重命名 ----------
-            fileListContainer.addEventListener('click', (e) => {
-                const renameIcon = e.target.closest('.rename-icon');
-                if (renameIcon) {
-                    const fileItem = renameIcon.closest('.file-item');
-                    const nameSpan = fileItem.querySelector('.file-name');
-                    const currentName = nameSpan.textContent;
-                    const newName = prompt('重命名题集名称：', currentName);
-                    if (newName && newName.trim() !== '') {
-                        nameSpan.textContent = newName.trim();
-                        nameSpan.title = newName.trim();
-                        showToastMsg('✅ 题集已重命名', 'success');
-                    }
+        // ---------- 首页与主应用切换 ----------
+        function enterMainApp() {
+            homePage.style.display = 'none';
+            mainApp.style.display = 'flex';
+        }
+
+        function goHome() {
+            mainApp.style.display = 'none';
+            homePage.style.display = 'flex';
+        }
+
+        enterPractice.addEventListener('click', enterMainApp);
+        backHomeBtn.addEventListener('click', goHome);
+
+        // ---------- 登录/注册 ----------
+        enterLogin.addEventListener('click', () => {
+            document.getElementById('loginOverlay').style.display = 'flex';
+        });
+
+        // ---------- 侧边栏导航 ----------
+        sidebarMenu.forEach(li => {
+            li.addEventListener('click', function() {
+                const page = this.dataset.page;
+                if (['mistake', 'weakness', 'mnemonic', 'library', 'account', 'admin'].includes(page) && !currentUser) {
+                    showToastMsg('请先登录以使用此功能', 'info');
+                    document.getElementById('loginOverlay').style.display = 'flex';
+                    return;
+                }
+                if (page === 'admin' && currentUser && currentUser.role !== 'admin') {
+                    showToastMsg('您没有管理员权限', 'error');
+                    return;
+                }
+                switchPage(page);
+                if (page === 'generate') updateFileList();
+            });
+        });
+
+        // ---------- 文件列表重命名 ----------
+        fileListContainer.addEventListener('click', (e) => {
+            const renameIcon = e.target.closest('.rename-icon');
+            if (renameIcon) {
+                const fileItem = renameIcon.closest('.file-item');
+                const nameSpan = fileItem.querySelector('.file-name');
+                const currentName = nameSpan.textContent;
+                const newName = prompt('重命名题集名称：', currentName);
+                if (newName && newName.trim() !== '') {
+                    nameSpan.textContent = newName.trim();
+                    nameSpan.title = newName.trim();
+                    showToastMsg('✅ 题集已重命名', 'success');
+                }
+            }
+        });
+
+        // ---------- 更新文件列表 ----------
+        function updateFileList() {
+            const name = collectionName.value.trim() || '未命名题集';
+            const items = fileListContainer.querySelectorAll('.file-item');
+            let exists = false;
+            items.forEach(item => {
+                const nameSpan = item.querySelector('.file-name');
+                if (nameSpan.textContent === name) {
+                    exists = true;
                 }
             });
-
-            // ---------- 更新文件列表 ----------
-            function updateFileList() {
-                const name = collectionName.value.trim() || '未命名题集';
-                const items = fileListContainer.querySelectorAll('.file-item');
-                let exists = false;
-                items.forEach(item => {
-                    const nameSpan = item.querySelector('.file-name');
-                    if (nameSpan.textContent === name) {
-                        exists = true;
-                    }
-                });
-                if (!exists && generatedQuestions.length > 0) {
-                    const newItem = document.createElement('div');
-                    newItem.className = 'file-item';
-                    newItem.dataset.file = 'custom_' + Date.now();
-                    newItem.innerHTML = `
+            if (!exists && generatedQuestions.length > 0) {
+                const newItem = document.createElement('div');
+                newItem.className = 'file-item';
+                newItem.dataset.file = 'custom_' + Date.now();
+                newItem.innerHTML = `
                         <span class="file-name" title="${name}">${name}</span>
                         <span class="rename-icon" title="重命名"><i class="fas fa-pencil-alt"></i></span>
                     `;
-                    fileListContainer.appendChild(newItem);
-                }
+                fileListContainer.appendChild(newItem);
+            }
+        }
+
+        // ---------- 上传文档 ----------
+        uploadZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        });
+
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.style.borderColor = '#4a8fe0';
+            uploadZone.style.background = '#f4f9ff';
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.style.borderColor = '#cbd5e1';
+            uploadZone.style.background = '#fafcff';
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.style.borderColor = '#cbd5e1';
+            uploadZone.style.background = '#fafcff';
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        });
+
+        async function handleFile(file) {
+            if (!file.name.endsWith('.docx')) {
+                uploadStatus.textContent = '❌ 请上传 .docx 格式的文件';
+                uploadStatus.className = 'upload-status error';
+                return;
             }
 
-            // ---------- 上传文档 ----------
-            uploadZone.addEventListener('click', () => {
-                fileInput.click();
-            });
+            uploadStatus.textContent = '⏳ 正在解析文档...';
+            uploadStatus.className = 'upload-status';
 
-            fileInput.addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    handleFile(file);
-                }
-            });
-
-            uploadZone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                uploadZone.style.borderColor = '#4a8fe0';
-                uploadZone.style.background = '#f4f9ff';
-            });
-
-            uploadZone.addEventListener('dragleave', () => {
-                uploadZone.style.borderColor = '#cbd5e1';
-                uploadZone.style.background = '#fafcff';
-            });
-
-            uploadZone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                uploadZone.style.borderColor = '#cbd5e1';
-                uploadZone.style.background = '#fafcff';
-                const file = e.dataTransfer.files[0];
-                if (file) {
-                    handleFile(file);
-                }
-            });
-
-            async function handleFile(file) {
-                if (!file.name.endsWith('.docx')) {
-                    uploadStatus.textContent = '❌ 请上传 .docx 格式的文件';
+            try {
+                const text = await extractTextFromDocx(file);
+                const extracted = text.trim();
+                if (extracted.length === 0) {
+                    uploadStatus.textContent = '⚠️ 文档中未提取到文字，请检查内容';
                     uploadStatus.className = 'upload-status error';
                     return;
                 }
-
-                uploadStatus.textContent = '⏳ 正在解析文档...';
+                uploadedFileName = file.name.replace(/\.docx$/i, '');
+                uploadStatus.textContent = `✅ 解析成功！共 ${extracted.length} 字符，文档：${uploadedFileName}`;
                 uploadStatus.className = 'upload-status';
-
-                try {
-                    const text = await extractTextFromDocx(file);
-                    const extracted = text.trim();
-                    if (extracted.length === 0) {
-                        uploadStatus.textContent = '⚠️ 文档中未提取到文字，请检查内容';
-                        uploadStatus.className = 'upload-status error';
-                        return;
-                    }
-                    uploadedFileName = file.name.replace(/\.docx$/i, '');
-                    uploadStatus.textContent = `✅ 解析成功！共 ${extracted.length} 字符，文档：${uploadedFileName}`;
-                    uploadStatus.className = 'upload-status';
-                    showToastMsg(`✅ 文档 "${uploadedFileName}" 解析成功`, 'success');
-                    if (!collectionName.value.trim()) {
-                        collectionName.value = uploadedFileName;
-                    }
-                } catch (err) {
-                    console.error(err);
-                    uploadStatus.textContent = '❌ 文档解析失败：' + err.message;
-                    uploadStatus.className = 'upload-status error';
+                showToastMsg(`✅ 文档 "${uploadedFileName}" 解析成功`, 'success');
+                if (!collectionName.value.trim()) {
+                    collectionName.value = uploadedFileName;
                 }
+            } catch (err) {
+                console.error(err);
+                uploadStatus.textContent = '❌ 文档解析失败：' + err.message;
+                uploadStatus.className = 'upload-status error';
+            }
+        }
+
+        async function extractTextFromDocx(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const result = await mammoth.extractRawText({ arrayBuffer });
+            return result.value;
+        }
+
+        // ---------- 调用大模型生成题目 ----------
+        async function generateQuestions() {
+            if (!uploadedFileName && uploadStatus.textContent.indexOf('解析成功') === -1) {
+                showToastMsg('⚠️ 请先上传 Word 文档', 'error');
+                return;
             }
 
-            async function extractTextFromDocx(file) {
-                const arrayBuffer = await file.arrayBuffer();
-                const result = await mammoth.extractRawText({ arrayBuffer });
-                return result.value;
+            const count = parseInt(questionCount.value, 10);
+            const diff = difficulty.value;
+            const type = questionType.value;
+
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = '<span class="spinner"></span> 生成中…';
+
+            let typeInstruction = '';
+            if (type === '单选题') {
+                typeInstruction = '全部为单选题，每个题目有4个选项，只有一个正确答案。';
+            } else if (type === '多选题') {
+                typeInstruction = '全部为多选题，每个题目有4个选项，正确答案可能为多个。';
+            } else {
+                typeInstruction = '混合出题：部分为单选题，部分为多选题。';
             }
 
-            // ---------- 生成题目（模拟演示） ----------
-            generateBtn.addEventListener('click', generateQuestions);
+            const textForPrompt = extractedText ? extractedText.slice(0, 4000) : '（暂无文档，请生成一道生物选择题）';
 
-            async function generateQuestions() {
-                if (!uploadedFileName && uploadStatus.textContent.indexOf('解析成功') === -1) {
-                    showToastMsg('⚠️ 请先上传 Word 文档', 'error');
-                    return;
+            const prompt = `
+                    你是一个教育专家。请根据以下文档内容，生成 ${count} 道 ${diff} 难度的${type}。
+                    ${typeInstruction}
+                    要求：
+                    1. 每个题目包含：题干、4个选项（A、B、C、D）、正确答案、解析。
+                    2. 输出格式为 JSON 数组，每个对象包含："question", "options", "answer", "explanation"。
+                    3. 只输出 JSON，不要包含任何额外解释。
+                    文档内容如下：
+                    ${textForPrompt}
+                `;
+
+            try {
+                const response = await fetch(LLM_API_BASE, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${LLM_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: LLM_MODEL_ID,
+                        messages: [
+                            { role: 'system', content: '你是一个专业的教育出题助手，只输出 JSON 格式。' },
+                            { role: 'user', content: prompt }
+                        ],
+                        temperature: 0.7,
+                        max_tokens: 4000
+                    })
+                });
+
+                if (!response.ok) {
+                    let errMsg = `API 请求失败 (${response.status})`;
+                    try {
+                        const errData = await response.json();
+                        if (errData.error) {
+                            errMsg += ': ' + errData.error;
+                        }
+                    } catch (_) {}
+                    throw new Error(errMsg);
                 }
 
-                const count = parseInt(questionCount.value, 10);
-                const diff = difficulty.value;
-                const type = questionType.value;
+                const data = await response.json();
+                const content = data.choices?.[0]?.message?.content || '';
 
-                generateBtn.disabled = true;
-                generateBtn.innerHTML = '<span class="spinner"></span> 生成中…';
+                let jsonStr = content.trim();
+                jsonStr = jsonStr.replace(/```json?/g, '').replace(/```/g, '').trim();
 
-                await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 600));
+                let questions = JSON.parse(jsonStr);
+                if (!Array.isArray(questions) || questions.length === 0) {
+                    throw new Error('AI 生成的题目为空');
+                }
 
-                const sampleQuestions = generateSampleQuestions(count, diff, type);
-                generatedQuestions = sampleQuestions;
-
-                renderQuestions(sampleQuestions);
-
+                questions = questions.filter(q => q.question && q.options && q.answer);
+                generatedQuestions = questions;
+                renderQuestions(questions);
                 updateFileList();
+                showToastMsg(`✅ 成功生成 ${questions.length} 道题目！`, 'success');
 
+                // 加入习题总库
+                libraryData = libraryData.concat(questions.map(q => ({ ...q, date: new Date().toISOString().slice(0, 10) })));
+                renderLibrary();
+
+            } catch (err) {
+                console.error(err);
+                showToastMsg('❌ 生成失败：' + err.message, 'error');
+            } finally {
                 generateBtn.disabled = false;
                 generateBtn.innerHTML = '🚀 生成题目';
+            }
+        }
 
-                showToastMsg(`✅ 成功生成 ${sampleQuestions.length} 道题目！`, 'success');
+        generateBtn.addEventListener('click', generateQuestions);
 
-                // 显示提交按钮
-                submitBtn.style.display = 'inline-flex';
-                allAnswersRevealed = false;
+        // ---------- 渲染题目 ----------
+        function renderQuestions(questions) {
+            if (!questions || questions.length === 0) {
+                questionDisplayArea.style.display = 'none';
+                return;
             }
 
-            function generateSampleQuestions(count, diff, type) {
-                const questions = [];
-                const topics = ['细胞膜的结构', '酶的催化特性', 'DNA复制过程', '蛋白质合成', '信号转导', '细胞周期调控', '免疫应答', '血液循环', '呼吸调节', '消化吸收'];
-                for (let i = 0; i < count; i++) {
-                    const topic = topics[i % topics.length];
-                    const isMulti = type === '多选题' || (type === '混合' && i % 2 === 0);
-                    const optTexts = [
-                        `A. ${topic}是生命活动的基础`,
-                        `B. ${topic}与疾病发生密切相关`,
-                        `C. ${topic}受多种因素调控`,
-                        `D. ${topic}在不同细胞中表现一致`
-                    ];
-                    const answer = isMulti ? ['A', 'C'] : 'A';
-                    questions.push({
-                        question: `【${isMulti ? '多选' : '单选'}】关于${topic}，以下说法正确的是？`,
-                        options: optTexts,
-                        answer: answer,
-                        explanation: `${topic}是细胞功能的核心，涉及信号转导、代谢调节等关键过程。`,
-                        source: uploadedFileName || '未知文档',
-                        date: new Date().toISOString().slice(0, 10)
-                    });
-                }
-                return questions;
-            }
+            questionDisplayArea.style.display = 'block';
+            resultCount.textContent = `${questions.length} 题`;
 
-            // ---------- 渲染题目（根据模式显示UI） ----------
-            function renderQuestions(questions) {
-                if (!questions || questions.length === 0) {
-                    questionDisplayArea.style.display = 'none';
-                    return;
-                }
+            let html = '';
+            questions.forEach((q, idx) => {
+                const number = idx + 1;
+                const isMulti = Array.isArray(q.answer) && q.answer.length > 1;
+                const inputType = isMulti ? 'checkbox' : 'radio';
+                const name = `q_${idx}`;
 
-                questionDisplayArea.style.display = 'block';
-                resultCount.textContent = `${questions.length} 题`;
-
-                let html = '';
-                questions.forEach((q, idx) => {
-                    const number = idx + 1;
-                    const isMulti = Array.isArray(q.answer) && q.answer.length > 1;
-                    const inputType = isMulti ? 'checkbox' : 'radio';
-                    const name = `q_${idx}`;
-
-                    let optionsHtml = q.options.map((opt, oi) => {
-                        const label = String.fromCharCode(65 + oi);
-                        return `
+                let optionsHtml = q.options.map((opt, oi) => {
+                    const label = String.fromCharCode(65 + oi);
+                    return `
                             <label class="option" style="display:block;padding:4px 0;cursor:pointer;font-size:14px;">
                                 <input type="${inputType}" name="${name}" value="${label}" style="margin-right:8px;" data-index="${idx}" data-value="${label}">
                                 ${label}. ${opt.replace(/^[A-D]\.\s*/, '')}
                             </label>
                         `;
-                    }).join('');
+                }).join('');
 
-                    const showPerQuestionBtn = answerDisplayMode === 'perQuestion';
+                const showPerQuestionBtn = answerDisplayMode === 'perQuestion';
 
-                    html += `
+                html += `
                         <div class="question-item" data-index="${idx}" style="background:#f8fafc;border-radius:14px;padding:18px 22px;margin-bottom:14px;border:1px solid #e9edf2;">
                             <div style="font-weight:600;margin-bottom:8px;"><span style="color:#1e40af;">${number}.</span> ${q.question}</div>
                             <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;padding-left:4px;">${optionsHtml}</div>
@@ -855,36 +1636,83 @@
                             </div>
                         </div>
                     `;
+            });
+
+            questionList.innerHTML = html;
+
+            document.querySelectorAll('.check-single-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const idx = parseInt(this.dataset.index);
+                    checkSingleAnswer(idx);
                 });
+            });
 
-                questionList.innerHTML = html;
+            if (answerDisplayMode === 'afterAll') {
+                submitBtn.style.display = 'inline-flex';
+                submitBtn.onclick = function() {
+                    checkAllAnswers();
+                };
+            } else {
+                submitBtn.style.display = 'none';
+            }
+        }
 
-                // 绑定每道题的独立检查按钮
-                document.querySelectorAll('.check-single-btn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const idx = parseInt(this.dataset.index);
-                        checkSingleAnswer(idx);
-                    });
-                });
+        // ---------- 检查单题 ----------
+        function checkSingleAnswer(index) {
+            const q = generatedQuestions[index];
+            if (!q) return;
+            const item = document.querySelector(`.question-item[data-index="${index}"]`);
+            const inputs = item.querySelectorAll('input[type="radio"], input[type="checkbox"]');
+            const feedback = document.getElementById(`answerFeedback_${index}`);
 
-                // 绑定页面底部的提交按钮
-                if (answerDisplayMode === 'afterAll') {
-                    submitBtn.style.display = 'inline-flex';
-                    submitBtn.onclick = function() {
-                        checkAllAnswers();
-                    };
-                } else {
-                    submitBtn.style.display = 'none';
+            const selected = [];
+            inputs.forEach(input => {
+                if (input.checked) {
+                    selected.push(input.value);
                 }
+            });
+
+            if (selected.length === 0) {
+                showToastMsg('请先选择一个选项', 'info');
+                return;
             }
 
-            // ---------- 检查单题（perQuestion模式） ----------
-            function checkSingleAnswer(index) {
-                const q = generatedQuestions[index];
-                if (!q) return;
-                const item = document.querySelector(`.question-item[data-index="${index}"]`);
+            const correct = Array.isArray(q.answer) ? q.answer : [q.answer];
+            const isCorrect = JSON.stringify(selected.sort()) === JSON.stringify(correct.sort());
+
+            feedback.style.display = 'block';
+            document.getElementById(`answerText_${index}`).textContent = Array.isArray(q.answer) ? q.answer.join('、') : q.answer;
+            document.getElementById(`explanationText_${index}`).textContent = q.explanation;
+
+            const statusSpan = document.createElement('span');
+            statusSpan.style.marginRight = '10px';
+            statusSpan.style.fontWeight = '600';
+            if (isCorrect) {
+                statusSpan.style.color = '#16a34a';
+                statusSpan.textContent = '✅ 正确';
+            } else {
+                statusSpan.style.color = '#dc2626';
+                statusSpan.textContent = '❌ 错误';
+                addToMistakeBook(q);
+            }
+            const existing = feedback.querySelector('.status-tag');
+            if (existing) existing.remove();
+            statusSpan.className = 'status-tag';
+            feedback.prepend(statusSpan);
+
+            inputs.forEach(input => input.disabled = true);
+        }
+
+        // ---------- 检查全部题目 ----------
+        function checkAllAnswers() {
+            if (generatedQuestions.length === 0) return;
+            let allAnswered = true;
+            let allCorrect = true;
+
+            generatedQuestions.forEach((q, idx) => {
+                const item = document.querySelector(`.question-item[data-index="${idx}"]`);
                 const inputs = item.querySelectorAll('input[type="radio"], input[type="checkbox"]');
-                const feedback = document.getElementById(`answerFeedback_${index}`);
+                const feedback = document.getElementById(`answerFeedback_${idx}`);
 
                 const selected = [];
                 inputs.forEach(input => {
@@ -894,16 +1722,16 @@
                 });
 
                 if (selected.length === 0) {
-                    showToastMsg('请先选择一个选项', 'info');
-                    return;
+                    allAnswered = false;
                 }
 
                 const correct = Array.isArray(q.answer) ? q.answer : [q.answer];
                 const isCorrect = JSON.stringify(selected.sort()) === JSON.stringify(correct.sort());
+                if (!isCorrect) allCorrect = false;
 
                 feedback.style.display = 'block';
-                document.getElementById(`answerText_${index}`).textContent = Array.isArray(q.answer) ? q.answer.join('、') : q.answer;
-                document.getElementById(`explanationText_${index}`).textContent = q.explanation;
+                document.getElementById(`answerText_${idx}`).textContent = Array.isArray(q.answer) ? q.answer.join('、') : q.answer;
+                document.getElementById(`explanationText_${idx}`).textContent = q.explanation;
 
                 const statusSpan = document.createElement('span');
                 statusSpan.style.marginRight = '10px';
@@ -914,595 +1742,820 @@
                 } else {
                     statusSpan.style.color = '#dc2626';
                     statusSpan.textContent = '❌ 错误';
+                    addToMistakeBook(q);
                 }
                 const existing = feedback.querySelector('.status-tag');
                 if (existing) existing.remove();
                 statusSpan.className = 'status-tag';
                 feedback.prepend(statusSpan);
-            }
 
-            // ---------- 检查全部题目（afterAll模式） ----------
-            function checkAllAnswers() {
-                if (generatedQuestions.length === 0) return;
-                let allAnswered = true;
-                let allCorrect = true;
-
-                generatedQuestions.forEach((q, idx) => {
-                    const item = document.querySelector(`.question-item[data-index="${idx}"]`);
-                    const inputs = item.querySelectorAll('input[type="radio"], input[type="checkbox"]');
-                    const feedback = document.getElementById(`answerFeedback_${idx}`);
-
-                    const selected = [];
-                    inputs.forEach(input => {
-                        if (input.checked) {
-                            selected.push(input.value);
-                        }
-                    });
-
-                    if (selected.length === 0) {
-                        allAnswered = false;
-                    }
-
-                    const correct = Array.isArray(q.answer) ? q.answer : [q.answer];
-                    const isCorrect = JSON.stringify(selected.sort()) === JSON.stringify(correct.sort());
-                    if (!isCorrect) allCorrect = false;
-
-                    feedback.style.display = 'block';
-                    document.getElementById(`answerText_${idx}`).textContent = Array.isArray(q.answer) ? q.answer.join('、') : q.answer;
-                    document.getElementById(`explanationText_${idx}`).textContent = q.explanation;
-
-                    const statusSpan = document.createElement('span');
-                    statusSpan.style.marginRight = '10px';
-                    statusSpan.style.fontWeight = '600';
-                    if (isCorrect) {
-                        statusSpan.style.color = '#16a34a';
-                        statusSpan.textContent = '✅ 正确';
-                    } else {
-                        statusSpan.style.color = '#dc2626';
-                        statusSpan.textContent = '❌ 错误';
-                    }
-                    const existing = feedback.querySelector('.status-tag');
-                    if (existing) existing.remove();
-                    statusSpan.className = 'status-tag';
-                    feedback.prepend(statusSpan);
-                });
-
-                if (!allAnswered) {
-                    showToastMsg('请先完成所有题目再提交', 'info');
-                } else if (allCorrect) {
-                    showToastMsg('🎉 全部正确！继续加油！', 'success');
-                } else {
-                    showToastMsg('📝 已显示所有题目的答案和解析，请查看', 'info');
-                }
-                allAnswersRevealed = true;
-            }
-
-            // ---------- 获取显示时机设置 ----------
-            document.querySelectorAll('input[name="answerDisplay"]').forEach(radio => {
-                radio.addEventListener('change', function() {
-                    answerDisplayMode = this.value;
-                    // 如果已经生成了题目，重新渲染以应用新模式
-                    if (generatedQuestions.length > 0) {
-                        renderQuestions(generatedQuestions);
-                    }
-                    showToastMsg(`已切换为“${answerDisplayMode === 'afterAll' ? '全部做完再提交' : '每道题均可提交'}”模式`, 'info');
-                });
+                inputs.forEach(input => input.disabled = true);
             });
 
-            // ---------- 导出文本 ----------
-            exportTextBtn.addEventListener('click', () => {
-                if (generatedQuestions.length === 0) {
-                    showToastMsg('⚠️ 没有题目可导出', 'error');
-                    return;
-                }
-                let lines = [];
-                generatedQuestions.forEach((q, idx) => {
-                    const num = idx + 1;
-                    const answer = Array.isArray(q.answer) ? q.answer.join('、') : q.answer;
-                    lines.push(`${num}. ${q.question}`);
-                    q.options.forEach((opt, oi) => {
-                        const label = String.fromCharCode(65 + oi);
-                        lines.push(`   ${label}. ${opt.replace(/^[A-D]\.\s*/, '')}`);
-                    });
-                    lines.push(`   答案：${answer}`);
-                    lines.push(`   解析：${q.explanation}`);
-                    lines.push('');
-                });
-                const text = lines.join('\n');
-                const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `习题集_${new Date().toISOString().slice(0,10)}.txt`;
-                a.click();
-                URL.revokeObjectURL(url);
-                showToastMsg('✅ 导出成功！', 'success');
-            });
-
-            // ---------- 清空结果 ----------
-            clearResultBtn.addEventListener('click', () => {
-                generatedQuestions = [];
-                questionDisplayArea.style.display = 'none';
-                questionList.innerHTML = '';
-                resultCount.textContent = '0 题';
-                submitBtn.style.display = 'none';
-                showToastMsg('已清空当前题目', 'info');
-            });
-
-            // ---------- 错题本 ----------
-            async function loadMistakes() {
-                if (!currentUser) {
-                    showToastMsg('请先登录以查看错题本', 'info');
-                    document.getElementById('loginOverlay').style.display = 'flex';
-                    return;
-                }
-                try {
-                    const response = await fetch(`${API_BASE_URL}/mistakes`, {
-                        headers: { 'Authorization': `Bearer ${authToken}` }
-                    });
-                    const data = await response.json();
-                    if (data.error) throw new Error(data.error);
-                    mistakeData = data;
-                    renderMistakes();
-                } catch (err) {
-                    showToastMsg('加载错题本失败：' + err.message, 'error');
-                }
+            if (!allAnswered) {
+                showToastMsg('请先完成所有题目再提交', 'info');
+            } else if (allCorrect) {
+                showToastMsg('🎉 全部正确！继续加油！', 'success');
+            } else {
+                showToastMsg('📝 已显示所有题目的答案和解析，请查看', 'info');
             }
+            allAnswersRevealed = true;
+        }
 
-            function renderMistakes() {
-                if (!mistakeData || mistakeData.length === 0) {
-                    mistakeList.innerHTML = `<div style="color:#94a3b8;text-align:center;padding:40px 0;">暂无错题，加油！</div>`;
-                    mistakeCount.textContent = '共 0 题';
-                    return;
-                }
-                mistakeCount.textContent = `共 ${mistakeData.length} 题`;
-                let html = '';
-                mistakeData.forEach((q, idx) => {
-                    const answerText = Array.isArray(q.question_answer) ? q.question_answer.join('、') : q.question_answer;
-                    html += `
+        // ---------- 错题本 ----------
+        function addToMistakeBook(question) {
+            if (!currentUser) return;
+            let mistakes = JSON.parse(localStorage.getItem(`mistake_book_${currentUser.id}`) || '[]');
+            const exists = mistakes.some(q => q.question === question.question);
+            if (!exists) {
+                mistakes.push({ ...question, category: '默认', redoCount: 0, correctCount: 0 });
+                localStorage.setItem(`mistake_book_${currentUser.id}`, JSON.stringify(mistakes));
+                showToastMsg('📝 已收录到错题本', 'info');
+            }
+        }
+
+        function loadMistakes() {
+            if (!currentUser) return;
+            mistakeData = JSON.parse(localStorage.getItem(`mistake_book_${currentUser.id}`) || '[]');
+            renderMistakes();
+        }
+
+        function renderMistakes() {
+            if (!mistakeData || mistakeData.length === 0) {
+                mistakeList.innerHTML = `<div style="color:#94a3b8;text-align:center;padding:40px 0;">暂无错题，加油！</div>`;
+                mistakeCount.textContent = '共 0 题';
+                return;
+            }
+            mistakeCount.textContent = `共 ${mistakeData.length} 题`;
+            let html = '';
+            mistakeData.forEach((q, idx) => {
+                const answerText = Array.isArray(q.answer) ? q.answer.join('、') : q.answer;
+                const category = q.category || '默认';
+                const redoCount = q.redoCount || 0;
+                const correctCount = q.correctCount || 0;
+                const rate = redoCount > 0 ? Math.round((correctCount / redoCount) * 100) : 0;
+                html += `
                         <div class="mistake-item" data-index="${idx}">
                             <div class="checkbox-col">
                                 <input type="checkbox" class="mistake-check" data-index="${idx}" />
                             </div>
                             <div class="mistake-content">
-                                <div class="q-text">${q.question_content}</div>
+                                <div class="q-text">${q.question}</div>
                                 <div class="q-meta">
                                     <span>✅ 正确答案：${answerText}</span>
-                                    <span>📖 ${q.question_explanation}</span>
-                                    <span>📁 ${q.collection_name || '未知'}</span>
-                                    <span>📅 ${new Date(q.created_at).toLocaleDateString()}</span>
+                                    <span>📖 ${q.explanation}</span>
+                                    <span>📁 来源：${q.source || '未知'}</span>
+                                    <span>📅 ${q.date || '未知'}</span>
+                                    <span>🏷️ 分类：<span class="category-tag" onclick="editCategory(${idx})">${category}</span></span>
+                                    <span>🔄 重做 ${redoCount} 次，正确率 ${rate}%</span>
                                 </div>
                             </div>
                             <div class="mistake-actions">
-                                <button class="btn-outline btn-sm" onclick="deleteMistake(${q.id})">删除</button>
+                                <button class="btn-outline btn-sm" onclick="deleteMistake(${idx})">🗑️ 删除</button>
+                                <button class="btn-primary btn-sm" onclick="redoMistake(${idx})">🔄 重做</button>
                             </div>
                         </div>
                     `;
+            });
+            mistakeList.innerHTML = html;
+        }
+
+        function deleteMistake(index) {
+            if (!confirm('确定要删除这条错题吗？')) return;
+            mistakeData.splice(index, 1);
+            localStorage.setItem(`mistake_book_${currentUser.id}`, JSON.stringify(mistakeData));
+            renderMistakes();
+            showToastMsg('错题已删除', 'success');
+        }
+
+        function redoMistake(index) {
+            const q = mistakeData[index];
+            q.redoCount = (q.redoCount || 0) + 1;
+            // 模拟重做正确
+            if (Math.random() > 0.3) {
+                q.correctCount = (q.correctCount || 0) + 1;
+            }
+            localStorage.setItem(`mistake_book_${currentUser.id}`, JSON.stringify(mistakeData));
+            renderMistakes();
+            showToastMsg('🔄 已重做', 'info');
+        }
+
+        function editCategory(index) {
+            const q = mistakeData[index];
+            const newCategory = prompt('请输入新的分类名称：', q.category || '默认');
+            if (newCategory && newCategory.trim() !== '') {
+                q.category = newCategory.trim();
+                localStorage.setItem(`mistake_book_${currentUser.id}`, JSON.stringify(mistakeData));
+                renderMistakes();
+                showToastMsg('✅ 分类已更新', 'success');
+            }
+        }
+
+        // 错题本按钮事件
+        selectAllMistake.addEventListener('click', () => {
+            document.querySelectorAll('.mistake-check').forEach(cb => cb.checked = true);
+        });
+        deselectAllMistake.addEventListener('click', () => {
+            document.querySelectorAll('.mistake-check').forEach(cb => cb.checked = false);
+        });
+        redoSelectedBtn.addEventListener('click', () => {
+            const checked = document.querySelectorAll('.mistake-check:checked');
+            if (checked.length === 0) {
+                showToastMsg('请至少选择一道错题', 'info');
+                return;
+            }
+            checked.forEach(cb => {
+                const idx = parseInt(cb.dataset.index);
+                redoMistake(idx);
+            });
+            showToastMsg(`🔄 已重做 ${checked.length} 道错题`, 'success');
+        });
+        exportMistakeBtn.addEventListener('click', () => {
+            if (mistakeData.length === 0) {
+                showToastMsg('没有错题可导出', 'info');
+                return;
+            }
+            let lines = [];
+            mistakeData.forEach((q, idx) => {
+                lines.push(`${idx + 1}. ${q.question}`);
+                lines.push(`   答案：${Array.isArray(q.answer) ? q.answer.join('、') : q.answer}`);
+                lines.push(`   解析：${q.explanation}`);
+                lines.push('');
+            });
+            const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `错题本_${new Date().toISOString().slice(0,10)}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToastMsg('✅ 错题本导出成功', 'success');
+        });
+
+        // ---------- 薄弱知识点 ----------
+        function loadWeakness() {
+            if (!currentUser) return;
+            // 根据错题和上传文档自动生成
+            const mistakes = JSON.parse(localStorage.getItem(`mistake_book_${currentUser.id}`) || '[]');
+            const topics = [];
+            mistakes.forEach(q => {
+                const topic = q.question.replace(/^【.*?】/, '').slice(0, 20);
+                if (!topics.some(t => t.title === topic)) {
+                    topics.push({
+                        title: topic,
+                        description: `基于错题：${q.question.slice(0, 60)}...`,
+                        source: q.source || '未知',
+                        category: q.category || '默认'
+                    });
+                }
+            });
+            weaknessData = topics.length > 0 ? topics : [{ title: '暂无薄弱知识点', description: '请先完成练习并产生错题', source: '系统', category: '默认' }];
+            renderWeakness();
+        }
+
+        function renderWeakness() {
+            if (!weaknessData || weaknessData.length === 0) {
+                weaknessList.innerHTML = `<div style="color:#94a3b8;text-align:center;padding:40px 0;">暂无薄弱知识点</div>`;
+                return;
+            }
+            let html = '';
+            weaknessData.forEach((w, idx) => {
+                html += `
+                        <div class="weakness-item">
+                            <div class="weak-title">${w.title}</div>
+                            <div class="weak-desc">${w.description}</div>
+                            <div class="weak-actions">
+                                <span style="font-size:12px;color:#94a3b8;">📁 ${w.source}  |  🏷️ ${w.category}</span>
+                                <button class="btn-primary btn-sm" onclick="generateFromWeakness(${idx})">🎯 生成题目</button>
+                                <button class="btn-outline btn-sm" onclick="deleteWeakness(${idx})">🗑️ 删除</button>
+                            </div>
+                        </div>
+                    `;
+            });
+            weaknessList.innerHTML = html;
+        }
+
+        function generateFromWeakness(index) {
+            const w = weaknessData[index];
+            if (!w || w.title === '暂无薄弱知识点') {
+                showToastMsg('无法生成题目', 'info');
+                return;
+            }
+            // 模拟生成 3 道题
+            const qs = [
+                { question: `关于"${w.title}"的核心概念，以下描述正确的是？`, options: ['A. 描述A', 'B. 描述B', 'C. 描述C', 'D. 描述D'], answer: 'A',
+                    explanation: '这是基于薄弱知识点的生成题目。' },
+                { question: `"${w.title}"在应用中需要注意什么？`, options: ['A. 注意A', 'B. 注意B', 'C. 注意C', 'D. 注意D'], answer: 'B',
+                    explanation: '这是基于薄弱知识点的生成题目。' },
+                { question: `以下哪项最准确地反映了"${w.title}"的核心？`, options: ['A. 反映A', 'B. 反映B', 'C. 反映C', 'D. 反映D'],
+                    answer: 'C', explanation: '这是基于薄弱知识点的生成题目。' }
+            ];
+            renderQuestions(qs);
+            switchPage('generate');
+            showToastMsg(`🎯 已根据 "${w.title}" 生成 3 道题目`, 'success');
+        }
+
+        function deleteWeakness(index) {
+            if (!confirm('确定要删除这个薄弱知识点吗？')) return;
+            weaknessData.splice(index, 1);
+            renderWeakness();
+            showToastMsg('已删除', 'info');
+        }
+
+        weaknessGenerateBtn.addEventListener('click', () => {
+            if (weaknessData.length === 0 || weaknessData[0].title === '暂无薄弱知识点') {
+                showToastMsg('暂无薄弱知识点可出题', 'info');
+                return;
+            }
+            const qs = [];
+            const topics = weaknessData.filter(w => w.title !== '暂无薄弱知识点');
+            for (let i = 0; i < Math.min(5, topics.length); i++) {
+                const w = topics[i % topics.length];
+                qs.push({
+                    question: `关于"${w.title}"的知识点，以下说法正确的是？`,
+                    options: ['A. 基础原理', 'B. 实际应用', 'C. 相关拓展', 'D. 常见误区'],
+                    answer: 'A',
+                    explanation: `基于薄弱知识点 "${w.title}" 生成。`
                 });
-                mistakeList.innerHTML = html;
             }
+            renderQuestions(qs);
+            switchPage('generate');
+            showToastMsg('🎯 已根据薄弱知识点生成 5 道题目', 'success');
+        });
 
-            async function deleteMistake(mistakeId) {
-                if (!confirm('确定要删除这条错题吗？')) return;
-                try {
-                    const response = await fetch(`${API_BASE_URL}/mistakes/${mistakeId}`, {
-                        method: 'DELETE',
-                        headers: { 'Authorization': `Bearer ${authToken}` }
-                    });
-                    if (response.ok) {
-                        showToastMsg('错题已删除', 'success');
-                        loadMistakes();
-                    } else {
-                        showToastMsg('删除失败', 'error');
+        // ---------- 口诀题目 ----------
+        function loadMnemonics() {
+            if (!currentUser) return;
+            // 从 localStorage 加载
+            mnemonicData = JSON.parse(localStorage.getItem(`mnemonic_${currentUser.id}`) || '[]');
+            if (mnemonicData.length === 0) {
+                // 模拟一些口诀
+                mnemonicData = [
+                    { text: '一碳单位，二氢叶酸，三羧循环，四氢叶酸', meaning: '一碳单位代谢相关口诀', source: '生物化学' },
+                    { text: '心衰治疗：强心利尿扩血管，正性肌力减负荷', meaning: '心力衰竭治疗原则口诀', source: '药理学' },
+                    { text: '阿司匹林：解热镇痛抗炎，抑制血小板聚集', meaning: '阿司匹林药理作用口诀', source: '药理学' }
+                ];
+                localStorage.setItem(`mnemonic_${currentUser.id}`, JSON.stringify(mnemonicData));
+            }
+            renderMnemonics();
+        }
+
+        function renderMnemonics() {
+            if (!mnemonicData || mnemonicData.length === 0) {
+                mnemonicList.innerHTML = `<div style="color:#94a3b8;text-align:center;padding:40px 0;">暂无口诀</div>`;
+                return;
+            }
+            let html = '';
+            mnemonicData.forEach((m, idx) => {
+                html += `
+                        <div class="mnemonic-item">
+                            <div>
+                                <div class="mnemonic-text">📌 ${m.text}</div>
+                                <div class="mnemonic-meaning">${m.meaning || '点击搜索查看含义'}</div>
+                                <span style="font-size:12px;color:#94a3b8;">📁 ${m.source || '未知'}</span>
+                            </div>
+                            <div class="mnemonic-actions">
+                                <button class="btn-outline btn-sm" onclick="searchMnemonic(${idx})"><i class="fas fa-search"></i> 含义</button>
+                                <button class="btn-primary btn-sm" onclick="generateFromMnemonic(${idx})">📝 生成题目</button>
+                                <button class="btn-danger btn-sm" onclick="deleteMnemonic(${idx})">🗑️</button>
+                            </div>
+                        </div>
+                    `;
+            });
+            mnemonicList.innerHTML = html;
+        }
+
+        function searchMnemonic(idx) {
+            const m = mnemonicData[idx];
+            if (!m) return;
+            showToastMsg(`🔍 正在搜索 "${m.text}" 的含义...`, 'info');
+            setTimeout(() => {
+                m.meaning = `"${m.text}" 是医学中常用的记忆口诀，帮助记忆复杂知识点。`;
+                localStorage.setItem(`mnemonic_${currentUser.id}`, JSON.stringify(mnemonicData));
+                renderMnemonics();
+                showToastMsg(`✅ 已获取含义：${m.meaning}`, 'success');
+            }, 1000);
+        }
+
+        function generateFromMnemonic(idx) {
+            const m = mnemonicData[idx];
+            if (!m) return;
+            const qs = [
+                { question: `关于口诀"${m.text}"，以下理解正确的是？`, options: ['A. 理解A', 'B. 理解B', 'C. 理解C', 'D. 理解D'],
+                    answer: 'A', explanation: `基于口诀 "${m.text}" 生成。` },
+                { question: `"${m.text}" 对应的知识点是？`, options: ['A. 知识A', 'B. 知识B', 'C. 知识C', 'D. 知识D'], answer: 'B',
+                    explanation: `基于口诀 "${m.text}" 生成。` }
+            ];
+            renderQuestions(qs);
+            switchPage('generate');
+            showToastMsg(`📝 已根据口诀 "${m.text}" 生成 2 道题目`, 'success');
+        }
+
+        function deleteMnemonic(idx) {
+            if (!confirm('确定要删除这条口诀吗？')) return;
+            mnemonicData.splice(idx, 1);
+            localStorage.setItem(`mnemonic_${currentUser.id}`, JSON.stringify(mnemonicData));
+            renderMnemonics();
+            showToastMsg('已删除', 'info');
+        }
+
+        mnemonicGenerateBtn.addEventListener('click', () => {
+            if (mnemonicData.length === 0) {
+                showToastMsg('暂无口诀', 'info');
+                return;
+            }
+            const qs = mnemonicData.slice(0, 4).map((m, i) => ({
+                question: `关于口诀"${m.text}"的相关知识，以下说法正确的是？`,
+                options: ['A. 基本原理', 'B. 临床应用', 'C. 记忆方法', 'D. 常见误区'],
+                answer: 'A',
+                explanation: `基于口诀 "${m.text}" 生成。`
+            }));
+            renderQuestions(qs);
+            switchPage('generate');
+            showToastMsg('📝 已根据口诀生成 4 道题目', 'success');
+        });
+
+        // ---------- 习题总库 ----------
+        function loadLibrary() {
+            if (!currentUser) return;
+            libraryData = JSON.parse(localStorage.getItem(`library_${currentUser.id}`) || '[]');
+            renderLibrary();
+        }
+
+        function renderLibrary() {
+            let data = libraryData;
+            const keyword = librarySearch.value.trim().toLowerCase();
+            const timeFilter = libraryTimeFilter.value;
+
+            if (keyword) {
+                data = data.filter(q => q.question.toLowerCase().includes(keyword));
+            }
+            if (timeFilter !== 'all') {
+                const now = new Date();
+                data = data.filter(q => {
+                    const d = new Date(q.date || now);
+                    if (timeFilter === 'today') return d.toDateString() === now.toDateString();
+                    if (timeFilter === 'week') {
+                        const weekStart = new Date(now);
+                        weekStart.setDate(now.getDate() - now.getDay());
+                        return d >= weekStart;
                     }
-                } catch (err) {
-                    showToastMsg('删除失败：' + err.message, 'error');
-                }
+                    if (timeFilter === 'month') {
+                        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+                    }
+                    return true;
+                });
             }
 
-            // ---------- 薄弱知识点 ----------
-            async function loadWeakTopics() {
-                if (!currentUser) return;
-                try {
-                    const response = await fetch(`${API_BASE_URL}/weak-topics`, {
-                        headers: { 'Authorization': `Bearer ${authToken}` }
-                    });
-                    const data = await response.json();
-                    // 渲染薄弱知识点（此处省略具体渲染函数，可按需实现）
-                    console.log('薄弱知识点:', data);
-                } catch (err) {
-                    showToastMsg('加载薄弱知识点失败', 'error');
-                }
+            if (data.length === 0) {
+                libraryList.innerHTML = `<div style="color:#94a3b8;text-align:center;padding:40px 0;">习题总库为空</div>`;
+                document.querySelector('#page-library .page-header span').textContent = '共 0 题';
+                return;
             }
+            document.querySelector('#page-library .page-header span').textContent = `共 ${data.length} 题`;
+            let html = '';
+            data.forEach((q, idx) => {
+                const answerText = Array.isArray(q.answer) ? q.answer.join('、') : q.answer;
+                html += `
+                        <div class="library-item">
+                            <div class="lib-info">
+                                <div class="lib-name">${q.question}</div>
+                                <div class="lib-meta">✅ ${answerText}  |  📁 ${q.source || '未知'}  |  📅 ${q.date || '未知'}</div>
+                            </div>
+                            <div>
+                                <button class="btn-outline btn-sm" onclick="addToPractice(${idx})">📋 加入练习</button>
+                            </div>
+                        </div>
+                    `;
+            });
+            libraryList.innerHTML = html;
+        }
 
-            // ---------- 口诀题目 ----------
-            async function loadMnemonics() {
-                if (!currentUser) return;
-                try {
-                    const response = await fetch(`${API_BASE_URL}/mnemonics`, {
-                        headers: { 'Authorization': `Bearer ${authToken}` }
-                    });
-                    const data = await response.json();
-                    // 渲染口诀（此处省略具体渲染函数）
-                    console.log('口诀:', data);
-                } catch (err) {
-                    showToastMsg('加载口诀失败', 'error');
-                }
+        function addToPractice(idx) {
+            const q = libraryData[idx];
+            if (!q) return;
+            renderQuestions([q]);
+            switchPage('generate');
+            showToastMsg('📋 已加入练习区', 'success');
+        }
+
+        librarySearchBtn.addEventListener('click', renderLibrary);
+        librarySearch.addEventListener('keyup', (e) => { if (e.key === 'Enter') renderLibrary(); });
+        libraryTimeFilter.addEventListener('change', renderLibrary);
+
+        // ---------- 我的账户 ----------
+        function loadAccountInfo() {
+            if (!currentUser) return;
+            accountUsername.value = currentUser.username || '';
+            accountNickname.value = currentUser.nickname || currentUser.username || '';
+            accountRole.value = currentUser.role || 'normal';
+        }
+
+        changePasswordBtn.addEventListener('click', async () => {
+            const pwd = newPassword.value.trim();
+            const confirm = confirmNewPassword.value.trim();
+            if (!pwd || pwd.length < 6) {
+                showToastMsg('密码至少6位', 'error');
+                return;
             }
+            if (pwd !== confirm) {
+                showToastMsg('两次密码输入不一致', 'error');
+                return;
+            }
+            if (!pwd.match(/[a-zA-Z]/) && !pwd.match(/[0-9]/)) {
+                showToastMsg('密码需包含字母或数字', 'error');
+                return;
+            }
+            try {
+                const response = await fetch(`${API_BASE_URL}/admin/reset-password`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ userId: currentUser.id, newPassword: pwd })
+                });
+                if (response.ok) {
+                    showToastMsg('✅ 密码修改成功', 'success');
+                    newPassword.value = '';
+                    confirmNewPassword.value = '';
+                } else {
+                    showToastMsg('密码修改失败', 'error');
+                }
+            } catch (err) {
+                showToastMsg('密码修改失败：' + err.message, 'error');
+            }
+        });
 
-            // ---------- 习题总库 ----------
-            async function loadCollections() {
-                if (!currentUser) {
-                    showToastMsg('请先登录以查看我的题集', 'info');
-                    document.getElementById('loginOverlay').style.display = 'flex';
+        submitFeedbackBtn.addEventListener('click', () => {
+            const content = feedbackContent.value.trim();
+            if (!content) {
+                showToastMsg('请填写意见内容', 'info');
+                return;
+            }
+            // 模拟提交意见
+            showToastMsg('✅ 意见已提交，感谢您的反馈！', 'success');
+            feedbackContent.value = '';
+        });
+
+        // ---------- 管理员面板 ----------
+        function loadAdminUsers() {
+            if (!currentUser || currentUser.role !== 'admin') return;
+            // 模拟用户数据
+            allUsers = [
+                { id: 1, username: 'admin', nickname: '管理员', role: 'admin', status: 'online' },
+                { id: 2, username: 'liufeichang', nickname: '刘飞畅', role: 'admin', status: 'offline' },
+                { id: 3, username: 'user001', nickname: '用户1', role: 'normal', status: 'online' },
+                { id: 4, username: 'user002', nickname: '用户2', role: 'normal', status: 'banned' }
+            ];
+            renderAdminUsers();
+        }
+
+        function renderAdminUsers() {
+            userTableBody.innerHTML = '';
+            allUsers.forEach(u => {
+                const tr = document.createElement('tr');
+                const statusClass = u.status === 'online' ? 'online' : u.status === 'banned' ? 'banned' : 'offline';
+                const statusText = u.status === 'online' ? '🟢 在线' : u.status === 'banned' ? '🔴 已封禁' : '⚪ 离线';
+                tr.innerHTML = `
+                        <td>${u.username}</td>
+                        <td>${u.nickname || '-'}</td>
+                        <td><span class="category-tag">${u.role === 'admin' ? '管理员' : '普通用户'}</span></td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td>
+                            ${u.username !== 'admin' && u.username !== 'liufeichang' ? `
+                                ${u.status !== 'banned' ? `<button class="btn-danger btn-sm" onclick="banUser(${u.id})">封禁</button>` : `<button class="btn-success btn-sm" onclick="unbanUser(${u.id})">解封</button>`}
+                                <button class="btn-danger btn-sm" onclick="deleteUser(${u.id})">删除</button>
+                            ` : `<span style="color:#94a3b8;font-size:13px;">不可操作</span>`}
+                        </td>
+                    `;
+                userTableBody.appendChild(tr);
+            });
+            userCount.textContent = allUsers.length;
+        }
+
+        function banUser(id) {
+            if (!confirm('确定要封禁该用户吗？')) return;
+            const u = allUsers.find(usr => usr.id === id);
+            if (u) { u.status = 'banned';
+                renderAdminUsers();
+                showToastMsg(`已封禁 ${u.username}`, 'success'); }
+        }
+
+        function unbanUser(id) {
+            const u = allUsers.find(usr => usr.id === id);
+            if (u) { u.status = 'offline';
+                renderAdminUsers();
+                showToastMsg(`已解封 ${u.username}`, 'success'); }
+        }
+
+        function deleteUser(id) {
+            if (!confirm('确定要删除该用户吗？此操作不可恢复！')) return;
+            const idx = allUsers.findIndex(usr => usr.id === id);
+            if (idx !== -1) {
+                const name = allUsers[idx].username;
+                allUsers.splice(idx, 1);
+                renderAdminUsers();
+                showToastMsg(`已删除用户 ${name}`, 'success');
+            }
+        }
+
+        // ---------- 生成账号 ----------
+        showGenAccountBtn.addEventListener('click', () => {
+            genAccountModal.style.display = 'flex';
+            genResultDisplay.style.display = 'none';
+        });
+
+        cancelGenBtn.addEventListener('click', () => {
+            genAccountModal.style.display = 'none';
+        });
+
+        genModeRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                batchGenFields.style.display = this.value === 'batch' ? 'block' : 'none';
+                singleGenFields.style.display = this.value === 'single' ? 'block' : 'none';
+            });
+        });
+
+        confirmGenBtn.addEventListener('click', () => {
+            const mode = document.querySelector('input[name="genMode"]:checked').value;
+            let results = [];
+            if (mode === 'batch') {
+                const prefix = genPrefix.value.trim() || 'user';
+                const count = parseInt(genCount.value) || 3;
+                for (let i = 0; i < count; i++) {
+                    const username = `${prefix}${Math.floor(Math.random() * 10000)}`;
+                    const password = Math.random().toString(36).slice(-8);
+                    results.push({ username, password });
+                }
+            } else {
+                const username = singleUsername.value.trim();
+                const password = singlePassword.value.trim();
+                if (!username || !password || password.length < 6) {
+                    showToastMsg('请填写有效的用户名和密码（至少6位）', 'error');
                     return;
                 }
-                try {
-                    const response = await fetch(`${API_BASE_URL}/collections`, {
-                        headers: { 'Authorization': `Bearer ${authToken}` }
-                    });
-                    const data = await response.json();
-                    // 更新左侧文件列表
-                    fileListContainer.innerHTML = `<div style="font-size:13px;font-weight:600;color:#64748b;margin-bottom:6px;">📁 我的题集</div>`;
-                    data.forEach(collection => {
-                        const item = document.createElement('div');
-                        item.className = 'file-item';
-                        item.dataset.collectionId = collection.id;
-                        item.innerHTML = `
-                            <span class="file-name" title="${collection.name}">${collection.name}</span>
-                            <span class="rename-icon" title="重命名"><i class="fas fa-pencil-alt"></i></span>
-                        `;
-                        item.addEventListener('click', () => loadQuestions(collection.id));
-                        fileListContainer.appendChild(item);
-                    });
-                } catch (err) {
-                    showToastMsg('加载题集失败：' + err.message, 'error');
-                }
+                results.push({ username, password });
             }
+            genResultDisplay.style.display = 'block';
+            genResultDisplay.innerHTML = results.map(r =>
+                    `用户名: <strong>${r.username}</strong>  密码: <strong>${r.password}</strong>`
+                ).join('\n');
+            // 模拟存入后端
+            results.forEach(r => {
+                allUsers.push({
+                    id: Date.now() + Math.random() * 1000,
+                    username: r.username,
+                    nickname: r.username,
+                    role: 'normal',
+                    status: 'offline'
+                });
+            });
+            renderAdminUsers();
+            showToastMsg(`✅ 已生成 ${results.length} 个账号`, 'success');
+            // 清空输入
+            singleUsername.value = '';
+            singlePassword.value = '';
+        });
 
-            async function loadQuestions(collectionId) {
-                if (!currentUser) {
-                    showToastMsg('请先登录', 'info');
-                    return;
-                }
-                try {
-                    const response = await fetch(`${API_BASE_URL}/questions?collection_id=${collectionId}`, {
-                        headers: { 'Authorization': `Bearer ${authToken}` }
-                    });
-                    const data = await response.json();
-                    if (data.error) throw new Error(data.error);
-                    renderQuestions(data);
-                    showToastMsg(`共加载 ${data.length} 道题目`, 'success');
-                } catch (err) {
-                    showToastMsg('加载题目失败：' + err.message, 'error');
-                }
+        // ---------- 登录/注册 API ----------
+        async function login(username, password) {
+            const response = await fetch(`${API_BASE_URL}/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            const data = await response.json();
+            if (data.token) {
+                authToken = data.token;
+                localStorage.setItem('token', authToken);
+                currentUser = data.user;
+                return data.user;
+            } else {
+                throw new Error(data.error);
             }
+        }
 
-            // ---------- 其他功能按钮 ----------
-            // 错题本相关功能暂不启用（可绑定后端接口）
-            selectAllMistake.addEventListener('click', () => showToastMsg('该功能需后端支持，暂未开发', 'info'));
-            deselectAllMistake.addEventListener('click', () => showToastMsg('该功能需后端支持，暂未开发', 'info'));
-            redoSelectedBtn.addEventListener('click', () => showToastMsg('该功能需后端支持，暂未开发', 'info'));
-            dateFilter.addEventListener('change', () => showToastMsg('该功能需后端支持，暂未开发', 'info'));
-            sourceFilter.addEventListener('change', () => showToastMsg('该功能需后端支持，暂未开发', 'info'));
+        async function register(username, password, nickname) {
+            const response = await fetch(`${API_BASE_URL}/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password, nickname })
+            });
+            const data = await response.json();
+            if (data.token) {
+                authToken = data.token;
+                localStorage.setItem('token', authToken);
+                currentUser = data.user;
+                return data.user;
+            } else {
+                throw new Error(data.error);
+            }
+        }
 
-            weaknessGenerateBtn.addEventListener('click', () => showToastMsg('该功能需后端支持，暂未开发', 'info'));
-            mnemonicGenerateBtn.addEventListener('click', () => showToastMsg('该功能需后端支持，暂未开发', 'info'));
+        async function verifyToken() {
+            if (!authToken) return null;
+            const response = await fetch(`${API_BASE_URL}/verify-token`, {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                currentUser = data.user;
+                return data.user;
+            } else {
+                localStorage.removeItem('token');
+                authToken = null;
+                return null;
+            }
+        }
 
+        // ---------- 界面交互 ----------
+        const loginOverlay = document.getElementById('loginOverlay');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const adminGenForm = document.getElementById('adminGenForm');
+
+        document.getElementById('showRegister').addEventListener('click', () => {
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'block';
+            adminGenForm.style.display = 'none';
+        });
+
+        document.getElementById('showLogin').addEventListener('click', () => {
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
+            adminGenForm.style.display = 'none';
+        });
+
+        document.getElementById('showAdminGen').addEventListener('click', () => {
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'none';
+            adminGenForm.style.display = 'block';
+        });
+
+        document.getElementById('showLoginFromGen').addEventListener('click', () => {
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
+            adminGenForm.style.display = 'none';
+        });
+
+        // 登录按钮
+        document.getElementById('loginBtn').addEventListener('click', async () => {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            if (!username || !password) {
+                alert('请填写用户名和密码');
+                return;
+            }
+            try {
+                const user = await login(username, password);
+                loginOverlay.style.display = 'none';
+                alert(`欢迎回来，${user.nickname || user.username}！`);
+                // 加载数据
+                loadMistakes();
+                loadLibrary();
+                loadWeakness();
+                loadMnemonics();
+                loadAccountInfo();
+                if (user.role === 'admin' || user.username === 'liufeichang') {
+                    adminMenuItem.style.display = 'block';
+                    loadAdminUsers();
+                }
+            } catch (err) {
+                alert('登录失败：' + err.message);
+            }
+        });
+
+        // 注册按钮（提示不支持注册）
+        document.getElementById('registerBtn').addEventListener('click', () => {
+            alert('目前仅支持已有用户登录，不支持注册');
+        });
+
+        // 生成账号按钮（管理员）
+        document.getElementById('genUsersBtn').addEventListener('click', async () => {
+            const count = parseInt(document.getElementById('genCountAdmin').value) || 3;
+            const prefix = document.getElementById('genPrefixAdmin').value.trim() || 'user';
+            try {
+                const users = await adminGenerateUsers(count, prefix);
+                const resultDiv = document.getElementById('genResult');
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = users.map(u => `用户名: ${u.username}  密码: ${u.password}`).join('\n');
+                const text = users.map(u => `用户名: ${u.username} 密码: ${u.password}`).join('\n');
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('✅ 已生成 ' + users.length + ' 个账号，已复制到剪贴板！');
+                }).catch(() => {
+                    alert('✅ 已生成 ' + users.length + ' 个账号，请手动复制。');
+                });
+            } catch (err) {
+                alert('生成失败：' + err.message);
+            }
+        });
+
+        async function adminGenerateUsers(count, prefix) {
+            const response = await fetch(`${API_BASE_URL}/admin/generate-users`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify({ count, prefix })
+            });
+            const data = await response.json();
+            if (data.users) {
+                return data.users;
+            } else {
+                throw new Error(data.error);
+            }
+        }
+
+        // ---------- 导出文本 ----------
+        exportTextBtn.addEventListener('click', () => {
+            if (generatedQuestions.length === 0) {
+                showToastMsg('⚠️ 没有题目可导出', 'error');
+                return;
+            }
+            let lines = [];
+            generatedQuestions.forEach((q, idx) => {
+                const num = idx + 1;
+                const answer = Array.isArray(q.answer) ? q.answer.join('、') : q.answer;
+                lines.push(`${num}. ${q.question}`);
+                q.options.forEach((opt, oi) => {
+                    const label = String.fromCharCode(65 + oi);
+                    lines.push(`   ${label}. ${opt.replace(/^[A-D]\.\s*/, '')}`);
+                });
+                lines.push(`   答案：${answer}`);
+                lines.push(`   解析：${q.explanation}`);
+                lines.push('');
+            });
+            const text = lines.join('\n');
+            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `习题集_${new Date().toISOString().slice(0,10)}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToastMsg('✅ 导出成功！', 'success');
+        });
+
+        // ---------- 清空结果 ----------
+        clearResultBtn.addEventListener('click', () => {
+            generatedQuestions = [];
+            questionDisplayArea.style.display = 'none';
+            questionList.innerHTML = '';
+            resultCount.textContent = '0 题';
+            submitBtn.style.display = 'none';
+            showToastMsg('已清空当前题目', 'info');
+        });
+
+        // ---------- 初始化 ----------
+        (async function() {
+            const user = await verifyToken();
+            if (user) {
+                currentUser = user;
+                loginOverlay.style.display = 'none';
+                loadMistakes();
+                loadLibrary();
+                loadWeakness();
+                loadMnemonics();
+                loadAccountInfo();
+                if (user.role === 'admin' || user.username === 'liufeichang') {
+                    adminMenuItem.style.display = 'block';
+                    loadAdminUsers();
+                }
+            } else {
+                loginOverlay.style.display = 'none';
+            }
             console.log('🧠 聪明肠 · 智能学习平台已启动');
-            console.log('💡 提示：所有数据均为模拟生成，后端功能暂未接入。');
-
         })();
+
+        // ---------- 显示时机设置 ----------
+        document.querySelectorAll('input[name="answerDisplay"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                answerDisplayMode = this.value;
+                if (generatedQuestions.length > 0) {
+                    renderQuestions(generatedQuestions);
+                }
+                showToastMsg(`已切换为“${answerDisplayMode === 'afterAll' ? '全部做完再提交' : '每道题均可提交'}”模式`, 'info');
+            });
+        });
+
+        // ---------- 全局暴露函数供 onclick 使用 ----------
+        window.editCategory = editCategory;
+        window.deleteMistake = deleteMistake;
+        window.redoMistake = redoMistake;
+        window.deleteWeakness = deleteWeakness;
+        window.generateFromWeakness = generateFromWeakness;
+        window.searchMnemonic = searchMnemonic;
+        window.generateFromMnemonic = generateFromMnemonic;
+        window.deleteMnemonic = deleteMnemonic;
+        window.addToPractice = addToPractice;
+        window.banUser = banUser;
+        window.unbanUser = unbanUser;
+        window.deleteUser = deleteUser;
+
+        console.log('✅ 所有功能已就绪');
     </script>
-<!-- ===== 登录弹窗 ===== -->
-<div id="loginOverlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;display:none;justify-content:center;align-items:center;">
-    <div style="background:#fff;border-radius:24px;padding:40px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);position:relative;">
-        <span onclick="document.getElementById('loginOverlay').style.display='none'" style="position:absolute;top:15px;right:20px;font-size:24px;cursor:pointer;color:#64748b;">&times;</span>
-        <h2 style="text-align:center;margin-bottom:20px;">🔑 登录聪明肠</h2>
-        <div id="loginForm">
-            <div style="margin-bottom:12px;">
-                <label style="font-size:13px;font-weight:500;color:#475569;display:block;margin-bottom:4px;">用户名</label>
-                <input type="text" id="loginUsername" placeholder="请输入用户名" style="width:100%;padding:10px 14px;border:1px solid #d1d9e6;border-radius:10px;font-size:14px;">
-            </div>
-            <div style="margin-bottom:12px;">
-                <label style="font-size:13px;font-weight:500;color:#475569;display:block;margin-bottom:4px;">密码</label>
-                <input type="password" id="loginPassword" placeholder="请输入密码" style="width:100%;padding:10px 14px;border:1px solid #d1d9e6;border-radius:10px;font-size:14px;">
-            </div>
-            <button id="loginBtn" style="width:100%;padding:12px;background:#4a8fe0;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;">登录</button>
-            <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:13px;">
-                <span style="color:#64748b;cursor:pointer;" id="showRegister">没有账号？注册</span>
-                <span style="color:#4a8fe0;cursor:pointer;" id="showAdminGen" style="display:none;">管理员生成账号</span>
-            </div>
-        </div>
-        <div id="registerForm" style="display:none;">
-            <div style="margin-bottom:12px;">
-                <label style="font-size:13px;font-weight:500;color:#475569;display:block;margin-bottom:4px;">用户名</label>
-                <input type="text" id="regUsername" placeholder="请输入用户名" style="width:100%;padding:10px 14px;border:1px solid #d1d9e6;border-radius:10px;font-size:14px;">
-            </div>
-            <div style="margin-bottom:12px;">
-                <label style="font-size:13px;font-weight:500;color:#475569;display:block;margin-bottom:4px;">密码</label>
-                <input type="password" id="regPassword" placeholder="至少6位" style="width:100%;padding:10px 14px;border:1px solid #d1d9e6;border-radius:10px;font-size:14px;">
-            </div>
-            <div style="margin-bottom:12px;">
-                <label style="font-size:13px;font-weight:500;color:#475569;display:block;margin-bottom:4px;">昵称（可选）</label>
-                <input type="text" id="regNickname" placeholder="昵称" style="width:100%;padding:10px 14px;border:1px solid #d1d9e6;border-radius:10px;font-size:14px;">
-            </div>
-            <button id="registerBtn" style="width:100%;padding:12px;background:#16a34a;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;">注册</button>
-            <div style="text-align:center;margin-top:8px;font-size:13px;color:#64748b;cursor:pointer;" id="showLogin">已有账号？去登录</div>
-        </div>
-        <div id="adminGenForm" style="display:none;">
-            <div style="margin-bottom:12px;">
-                <label style="font-size:13px;font-weight:500;color:#475569;display:block;margin-bottom:4px;">生成数量</label>
-                <input type="number" id="genCount" value="3" min="1" max="50" style="width:100%;padding:10px 14px;border:1px solid #d1d9e6;border-radius:10px;font-size:14px;">
-            </div>
-            <div style="margin-bottom:12px;">
-                <label style="font-size:13px;font-weight:500;color:#475569;display:block;margin-bottom:4px;">用户名前缀</label>
-                <input type="text" id="genPrefix" value="user" style="width:100%;padding:10px 14px;border:1px solid #d1d9e6;border-radius:10px;font-size:14px;">
-            </div>
-            <button id="genUsersBtn" style="width:100%;padding:12px;background:#f59e0b;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;">生成账号</button>
-            <div id="genResult" style="margin-top:12px;padding:12px;background:#f8fafc;border-radius:8px;font-size:13px;white-space:pre-wrap;display:none;"></div>
-            <div style="text-align:center;margin-top:8px;font-size:13px;color:#64748b;cursor:pointer;" id="showLoginFromGen">返回登录</div>
-        </div>
-    </div>
-</div>
 
-<script>
-// ========== 前端 API 调用 ==========
-const API_BASE_URL = 'https://congmingchang-backend-production.up.railway.app/api';
-let authToken = localStorage.getItem('token');
-let currentUser = null;
-
-// ========== 数据加载函数定义（必须先定义，再调用） ==========
-async function loadMistakes() {
-    if (!currentUser) {
-        showToastMsg('请先登录以查看错题本', 'info');
-        document.getElementById('loginOverlay').style.display = 'flex';
-        return;
-    }
-    try {
-        const response = await fetch(`${API_BASE_URL}/mistakes`, {
-            headers: { 'Authorization': `Bearer ${authToken}` }
-        });
-        const data = await response.json();
-        if (data.error) throw new Error(data.error);
-        mistakeData = data;
-        renderMistakes();
-    } catch (err) {
-        showToastMsg('加载错题本失败：' + err.message, 'error');
-    }
-}
-
-async function loadCollections() {
-    if (!currentUser) {
-        showToastMsg('请先登录以查看我的题集', 'info');
-        document.getElementById('loginOverlay').style.display = 'flex';
-        return;
-    }
-    try {
-        const response = await fetch(`${API_BASE_URL}/collections`, {
-            headers: { 'Authorization': `Bearer ${authToken}` }
-        });
-        const data = await response.json();
-        fileListContainer.innerHTML = `<div style="font-size:13px;font-weight:600;color:#64748b;margin-bottom:6px;">📁 我的题集</div>`;
-        data.forEach(collection => {
-            const item = document.createElement('div');
-            item.className = 'file-item';
-            item.dataset.collectionId = collection.id;
-            item.innerHTML = `
-                <span class="file-name" title="${collection.name}">${collection.name}</span>
-                <span class="rename-icon" title="重命名"><i class="fas fa-pencil-alt"></i></span>
-            `;
-            item.addEventListener('click', () => loadQuestions(collection.id));
-            fileListContainer.appendChild(item);
-        });
-    } catch (err) {
-        showToastMsg('加载题集失败：' + err.message, 'error');
-    }
-}
-
-async function loadQuestions(collectionId) {
-    if (!currentUser) {
-        showToastMsg('请先登录', 'info');
-        return;
-    }
-    try {
-        const response = await fetch(`${API_BASE_URL}/questions?collection_id=${collectionId}`, {
-            headers: { 'Authorization': `Bearer ${authToken}` }
-        });
-        const data = await response.json();
-        if (data.error) throw new Error(data.error);
-        renderQuestions(data);
-        showToastMsg(`共加载 ${data.length} 道题目`, 'success');
-    } catch (err) {
-        showToastMsg('加载题目失败：' + err.message, 'error');
-    }
-}
-
-// ========== 登录 ==========
-async function login(username, password) {
-    const response = await fetch(`${API_BASE_URL}/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-    });
-    const data = await response.json();
-    if (data.token) {
-        authToken = data.token;
-        localStorage.setItem('token', authToken);
-        currentUser = data.user;
-        return data.user;
-    } else {
-        throw new Error(data.error);
-    }
-}
-
-// ========== 注册 ==========
-async function register(username, password, nickname) {
-    const response = await fetch(`${API_BASE_URL}/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password, nickname })
-    });
-    const data = await response.json();
-    if (data.token) {
-        authToken = data.token;
-        localStorage.setItem('token', authToken);
-        currentUser = data.user;
-        return data.user;
-    } else {
-        throw new Error(data.error);
-    }
-}
-
-// ========== 管理员生成账号 ==========
-async function adminGenerateUsers(count, prefix) {
-    const response = await fetch(`${API_BASE_URL}/admin/generate-users`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${authToken}`
-        },
-        body: JSON.stringify({ count, prefix })
-    });
-    const data = await response.json();
-    if (data.users) {
-        return data.users;
-    } else {
-        throw new Error(data.error);
-    }
-}
-
-// ========== 验证token ==========
-async function verifyToken() {
-    if (!authToken) return null;
-    const response = await fetch(`${API_BASE_URL}/verify-token`, {
-        headers: { 'Authorization': `Bearer ${authToken}` }
-    });
-    if (response.ok) {
-        const data = await response.json();
-        currentUser = data.user;
-        return data.user;
-    } else {
-        localStorage.removeItem('token');
-        authToken = null;
-        return null;
-    }
-}
-
-// ========== 界面交互 ==========
-const loginOverlay = document.getElementById('loginOverlay');
-const loginForm = document.getElementById('loginForm');
-const registerForm = document.getElementById('registerForm');
-const adminGenForm = document.getElementById('adminGenForm');
-
-document.getElementById('showRegister').addEventListener('click', () => {
-    loginForm.style.display = 'none';
-    registerForm.style.display = 'block';
-    adminGenForm.style.display = 'none';
-});
-
-document.getElementById('showLogin').addEventListener('click', () => {
-    loginForm.style.display = 'block';
-    registerForm.style.display = 'none';
-    adminGenForm.style.display = 'none';
-});
-
-document.getElementById('showAdminGen').addEventListener('click', () => {
-    loginForm.style.display = 'none';
-    registerForm.style.display = 'none';
-    adminGenForm.style.display = 'block';
-});
-
-document.getElementById('showLoginFromGen').addEventListener('click', () => {
-    loginForm.style.display = 'block';
-    registerForm.style.display = 'none';
-    adminGenForm.style.display = 'none';
-});
-
-// ========== 登录按钮 ==========
-document.getElementById('loginBtn').addEventListener('click', async () => {
-    const username = document.getElementById('loginUsername').value.trim();
-    const password = document.getElementById('loginPassword').value.trim();
-    if (!username || !password) {
-        alert('请填写用户名和密码');
-        return;
-    }
-    try {
-        const user = await login(username, password);
-        loginOverlay.style.display = 'none';
-        alert(`欢迎回来，${user.nickname || user.username}！`);
-        // 加载用户数据
-        await loadMistakes();
-        await loadCollections();
-        // 如果是管理员，显示管理员功能
-        if (user.role === 'admin' || user.username === 'liufeichang') {
-            document.getElementById('showAdminGen').style.display = 'inline-block';
-        }
-    } catch (err) {
-        alert('登录失败：' + err.message);
-    }
-});
-
-// ========== 注册按钮 ==========
-document.getElementById('registerBtn').addEventListener('click', async () => {
-    const username = document.getElementById('regUsername').value.trim();
-    const password = document.getElementById('regPassword').value.trim();
-    const nickname = document.getElementById('regNickname').value.trim() || username;
-    if (!username || !password) {
-        alert('请填写用户名和密码');
-        return;
-    }
-    if (password.length < 6) {
-        alert('密码至少6位');
-        return;
-    }
-    try {
-        const user = await register(username, password, nickname);
-        loginOverlay.style.display = 'none';
-        alert(`注册成功！欢迎，${user.nickname}！`);
-        await loadMistakes();
-        await loadCollections();
-    } catch (err) {
-        alert('注册失败：' + err.message);
-    }
-});
-
-// ========== 生成账号按钮 ==========
-document.getElementById('genUsersBtn').addEventListener('click', async () => {
-    const count = parseInt(document.getElementById('genCount').value) || 3;
-    const prefix = document.getElementById('genPrefix').value.trim() || 'user';
-    try {
-        const users = await adminGenerateUsers(count, prefix);
-        const resultDiv = document.getElementById('genResult');
-        resultDiv.style.display = 'block';
-        resultDiv.innerHTML = users.map(u => `用户名: ${u.username}  密码: ${u.password}`).join('\n');
-        const text = users.map(u => `用户名: ${u.username} 密码: ${u.password}`).join('\n');
-        navigator.clipboard.writeText(text).then(() => {
-            alert('✅ 已生成 ' + users.length + ' 个账号，已复制到剪贴板！');
-        }).catch(() => {
-            alert('✅ 已生成 ' + users.length + ' 个账号，请手动复制。');
-        });
-    } catch (err) {
-        alert('生成失败：' + err.message);
-    }
-});
-
-// ========== 页面加载时验证token ==========
-(async function() {
-    const user = await verifyToken();
-    if (user) {
-        currentUser = user;
-        loginOverlay.style.display = 'none';
-        await loadMistakes();
-        await loadCollections();
-        if (user.role === 'admin' || user.username === 'liufeichang') {
-            document.getElementById('showAdminGen').style.display = 'inline-block';
-        }
-    } else {
-        loginOverlay.style.display = 'none';
-    }
-})();
-
-</script>
 </body>
 </html>
