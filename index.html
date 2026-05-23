@@ -1577,25 +1577,72 @@ async function generateQuestions() {
             throw new Error(errMsg);
         }
 
-        const rawText = await response.text();
-        let jsonStr = rawText.trim();
-        if (jsonStr.startsWith('```json')) jsonStr = jsonStr.slice(7);
-        else if (jsonStr.startsWith('```')) jsonStr = jsonStr.slice(3);
-        if (jsonStr.endsWith('```')) jsonStr = jsonStr.slice(0, -3);
-        jsonStr = jsonStr.trim();
+// --- 获取并解析返回数据 ---
+const rawText = await response.text();
+console.log('原始响应:', rawText); // 调试用
 
-        let questions = JSON.parse(jsonStr);
-        if (!Array.isArray(questions) || questions.length === 0) {
-            throw new Error('AI 返回的题目为空');
+let jsonStr = rawText.trim();
+
+// 去除 Markdown 标记
+if (jsonStr.startsWith('```json')) jsonStr = jsonStr.slice(7);
+else if (jsonStr.startsWith('```')) jsonStr = jsonStr.slice(3);
+if (jsonStr.endsWith('```')) jsonStr = jsonStr.slice(0, -3);
+jsonStr = jsonStr.trim();
+
+// --- 解析 API 返回的数据（兼容数组和单题对象） ---
+let questions = [];
+
+try {
+    const parsed = JSON.parse(jsonStr);
+    
+    // 情况1：AI 返回的是一个数组
+    if (Array.isArray(parsed)) {
+        questions = parsed;
+    }
+    // 情况2：AI 返回的是单个对象（你截图里的情况）
+    else if (typeof parsed === 'object' && parsed !== null) {
+        const single = parsed;
+        // 兼容中英文键名
+        const qText = single['题目'] || single['question'];
+        const qOptions = single['选项'] || single['options'];
+        const qAnswer = single['答案'] || single['answer'];
+        const qExplanation = single['解析'] || single['explanation'];
+        
+        if (qText && qOptions && qAnswer) {
+            // 将选项对象转换为字符串数组
+            let optionsArray = [];
+            if (typeof qOptions === 'object' && !Array.isArray(qOptions)) {
+                optionsArray = Object.entries(qOptions).map(([key, value]) => `${key}. ${value}`);
+            } else if (Array.isArray(qOptions)) {
+                optionsArray = qOptions;
+            }
+            
+            questions.push({
+                question: qText,
+                options: optionsArray,
+                answer: qAnswer,
+                explanation: qExplanation || ''
+            });
         }
+    }
+} catch (e) {
+    console.error('解析失败:', e);
+    throw new Error('无法解析 AI 返回的数据');
+}
 
-        questions = questions.filter(q => q.question && q.options && q.answer);
-        if (questions.length === 0) {
-            throw new Error('AI 返回的题目格式不正确');
-        }
+// --- 验证解析结果 ---
+if (!Array.isArray(questions) || questions.length === 0) {
+    console.error('解析后的数据:', questions);
+    throw new Error('AI 返回的题目为空');
+}
 
-        generatedQuestions = questions;
-        renderQuestions(questions);
+questions = questions.filter(q => q.question && q.options && q.answer);
+if (questions.length === 0) {
+    throw new Error('AI 返回的题目格式不正确');
+}
+
+generatedQuestions = questions;
+renderQuestions(questions);
         updateFileList();
         showToastMsg(`✅ 成功生成 ${questions.length} 道题目！`, 'success');
 
