@@ -917,7 +917,7 @@
                             <div id="uploadStatus" class="upload-status"></div>
                             <div class="settings-row">
                                 <div class="field">
-                                    <label>📝 题目数量</label>
+                                    <label> 题目数量</label>
                                     <select id="questionCount">
                                         <option value="3">3 题</option>
                                         <option value="5" selected>5 题</option>
@@ -926,7 +926,7 @@
                                     </select>
                                 </div>
                                 <div class="field">
-                                    <label>📊 难度</label>
+                                    <label> 难度</label>
                                     <select id="difficulty">
                                         <option value="简单">简单</option>
                                         <option value="中等" selected>中等</option>
@@ -934,7 +934,7 @@
                                     </select>
                                 </div>
                                 <div class="field">
-                                    <label>🎯 题型</label>
+                                    <label> 题型</label>
                                     <select id="questionType">
                                         <option value="单选题" selected>单选题</option>
                                         <option value="多选题">多选题</option>
@@ -1166,7 +1166,7 @@
     <div id="loginOverlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;display:none;justify-content:center;align-items:center;">
         <div style="background:#fff;border-radius:24px;padding:40px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);position:relative;">
             <span onclick="document.getElementById('loginOverlay').style.display='none'" style="position:absolute;top:15px;right:20px;font-size:24px;cursor:pointer;color:#64748b;">&times;</span>
-            <h2 style="text-align:center;margin-bottom:20px;">🔑 登录聪明肠</h2>
+            <h2 style="text-align:center;margin-bottom:20px;"> 登录聪明肠</h2>
             <div id="loginForm">
                 <div style="margin-bottom:12px;">
                     <label style="font-size:13px;font-weight:500;color:#475569;display:block;margin-bottom:4px;">用户名</label>
@@ -1631,7 +1631,7 @@ renderQuestions(questions);
         }
     } finally {
         generateBtn.disabled = false;
-        generateBtn.innerHTML = '🚀 生成题目';
+        generateBtn.innerHTML = ' 生成题目';
         if (generatedQuestions.length > 0) {
             submitBtn.style.display = 'inline-flex';
         }
@@ -1800,7 +1800,7 @@ renderQuestions(questions);
             if (!allAnswered) {
                 showToastMsg('请先完成所有题目再提交', 'info');
             } else if (allCorrect) {
-                showToastMsg('🎉 全部正确！继续加油！', 'success');
+                showToastMsg(' 全部正确！继续加油！', 'success');
             } else {
                 showToastMsg('📝 已显示所有题目的答案和解析，请查看', 'info');
             }
