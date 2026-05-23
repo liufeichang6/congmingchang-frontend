@@ -1252,7 +1252,73 @@ const API_BASE_URL = 'https://congmingchang-backend-production.up.railway.app/ap
 let authToken = localStorage.getItem('token');
 let currentUser = null;
 
-// 登录
+// ========== 数据加载函数定义（必须先定义，再调用） ==========
+async function loadMistakes() {
+    if (!currentUser) {
+        showToastMsg('请先登录以查看错题本', 'info');
+        document.getElementById('loginOverlay').style.display = 'flex';
+        return;
+    }
+    try {
+        const response = await fetch(`${API_BASE_URL}/mistakes`, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        const data = await response.json();
+        if (data.error) throw new Error(data.error);
+        mistakeData = data;
+        renderMistakes();
+    } catch (err) {
+        showToastMsg('加载错题本失败：' + err.message, 'error');
+    }
+}
+
+async function loadCollections() {
+    if (!currentUser) {
+        showToastMsg('请先登录以查看我的题集', 'info');
+        document.getElementById('loginOverlay').style.display = 'flex';
+        return;
+    }
+    try {
+        const response = await fetch(`${API_BASE_URL}/collections`, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        const data = await response.json();
+        fileListContainer.innerHTML = `<div style="font-size:13px;font-weight:600;color:#64748b;margin-bottom:6px;">📁 我的题集</div>`;
+        data.forEach(collection => {
+            const item = document.createElement('div');
+            item.className = 'file-item';
+            item.dataset.collectionId = collection.id;
+            item.innerHTML = `
+                <span class="file-name" title="${collection.name}">${collection.name}</span>
+                <span class="rename-icon" title="重命名"><i class="fas fa-pencil-alt"></i></span>
+            `;
+            item.addEventListener('click', () => loadQuestions(collection.id));
+            fileListContainer.appendChild(item);
+        });
+    } catch (err) {
+        showToastMsg('加载题集失败：' + err.message, 'error');
+    }
+}
+
+async function loadQuestions(collectionId) {
+    if (!currentUser) {
+        showToastMsg('请先登录', 'info');
+        return;
+    }
+    try {
+        const response = await fetch(`${API_BASE_URL}/questions?collection_id=${collectionId}`, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        const data = await response.json();
+        if (data.error) throw new Error(data.error);
+        renderQuestions(data);
+        showToastMsg(`共加载 ${data.length} 道题目`, 'success');
+    } catch (err) {
+        showToastMsg('加载题目失败：' + err.message, 'error');
+    }
+}
+
+// ========== 登录 ==========
 async function login(username, password) {
     const response = await fetch(`${API_BASE_URL}/login`, {
         method: 'POST',
@@ -1270,7 +1336,7 @@ async function login(username, password) {
     }
 }
 
-// 注册
+// ========== 注册 ==========
 async function register(username, password, nickname) {
     const response = await fetch(`${API_BASE_URL}/register`, {
         method: 'POST',
@@ -1288,7 +1354,7 @@ async function register(username, password, nickname) {
     }
 }
 
-// 管理员生成账号
+// ========== 管理员生成账号 ==========
 async function adminGenerateUsers(count, prefix) {
     const response = await fetch(`${API_BASE_URL}/admin/generate-users`, {
         method: 'POST',
@@ -1306,7 +1372,7 @@ async function adminGenerateUsers(count, prefix) {
     }
 }
 
-// 验证token
+// ========== 验证token ==========
 async function verifyToken() {
     if (!authToken) return null;
     const response = await fetch(`${API_BASE_URL}/verify-token`, {
@@ -1353,7 +1419,7 @@ document.getElementById('showLoginFromGen').addEventListener('click', () => {
     adminGenForm.style.display = 'none';
 });
 
-// 登录按钮
+// ========== 登录按钮 ==========
 document.getElementById('loginBtn').addEventListener('click', async () => {
     const username = document.getElementById('loginUsername').value.trim();
     const password = document.getElementById('loginPassword').value.trim();
@@ -1377,7 +1443,7 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
     }
 });
 
-// 注册按钮
+// ========== 注册按钮 ==========
 document.getElementById('registerBtn').addEventListener('click', async () => {
     const username = document.getElementById('regUsername').value.trim();
     const password = document.getElementById('regPassword').value.trim();
@@ -1394,7 +1460,6 @@ document.getElementById('registerBtn').addEventListener('click', async () => {
         const user = await register(username, password, nickname);
         loginOverlay.style.display = 'none';
         alert(`注册成功！欢迎，${user.nickname}！`);
-        // 加载用户数据
         await loadMistakes();
         await loadCollections();
     } catch (err) {
@@ -1402,7 +1467,7 @@ document.getElementById('registerBtn').addEventListener('click', async () => {
     }
 });
 
-// 生成账号按钮
+// ========== 生成账号按钮 ==========
 document.getElementById('genUsersBtn').addEventListener('click', async () => {
     const count = parseInt(document.getElementById('genCount').value) || 3;
     const prefix = document.getElementById('genPrefix').value.trim() || 'user';
@@ -1411,7 +1476,6 @@ document.getElementById('genUsersBtn').addEventListener('click', async () => {
         const resultDiv = document.getElementById('genResult');
         resultDiv.style.display = 'block';
         resultDiv.innerHTML = users.map(u => `用户名: ${u.username}  密码: ${u.password}`).join('\n');
-        // 自动复制到剪贴板
         const text = users.map(u => `用户名: ${u.username} 密码: ${u.password}`).join('\n');
         navigator.clipboard.writeText(text).then(() => {
             alert('✅ 已生成 ' + users.length + ' 个账号，已复制到剪贴板！');
@@ -1423,7 +1487,21 @@ document.getElementById('genUsersBtn').addEventListener('click', async () => {
     }
 });
 
-// 页面加载时验证token
+// ========== 页面加载时验证token ==========
+(async function() {
+    const user = await verifyToken();
+    if (user) {
+        currentUser = user;
+        loginOverlay.style.display = 'none';
+        await loadMistakes();
+        await loadCollections();
+        if (user.role === 'admin' || user.username === 'liufeichang') {
+            document.getElementById('showAdminGen').style.display = 'inline-block';
+        }
+    } else {
+        loginOverlay.style.display = 'none';
+    }
+})();
 (async function() {
     const user = await verifyToken();
     if (user) {
