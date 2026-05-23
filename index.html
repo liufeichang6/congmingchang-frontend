@@ -1497,101 +1497,113 @@
             return result.value;
         }
 
-        // ---------- 调用大模型生成题目 ----------
-        async function generateQuestions() {
-            if (!uploadedFileName && uploadStatus.textContent.indexOf('解析成功') === -1) {
-                showToastMsg('⚠️ 请先上传 Word 文档', 'error');
-                return;
-            }
+// ========== 生成题目（调用大模型） ==========
+async function generateQuestions() {
+    if (!uploadedFileName && uploadStatus.textContent.indexOf('解析成功') === -1) {
+        showToastMsg('⚠️ 请先上传 Word 文档', 'error');
+        return;
+    }
 
-            const count = parseInt(questionCount.value, 10);
-            const diff = difficulty.value;
-            const type = questionType.value;
+    const count = parseInt(questionCount.value, 10);
+    const diff = difficulty.value;
+    const type = questionType.value;
 
-            generateBtn.disabled = true;
-            generateBtn.innerHTML = '<span class="spinner"></span> 生成中…';
+    generateBtn.disabled = true;
+    generateBtn.innerHTML = '<span class="spinner"></span> 生成中…';
+    submitBtn.style.display = 'none';
 
-            let typeInstruction = '';
-            if (type === '单选题') {
-                typeInstruction = '全部为单选题，每个题目有4个选项，只有一个正确答案。';
-            } else if (type === '多选题') {
-                typeInstruction = '全部为多选题，每个题目有4个选项，正确答案可能为多个。';
-            } else {
-                typeInstruction = '混合出题：部分为单选题，部分为多选题。';
-            }
+    // --- 构建提示词 ---
+    let typeInstruction = '';
+    if (type === '单选题') typeInstruction = '全部为单选题，每个题目有4个选项，只有一个正确答案。';
+    else if (type === '多选题') typeInstruction = '全部为多选题，每个题目有4个选项，正确答案可能为多个。';
+    else typeInstruction = '混合出题：部分为单选题，部分为多选题。';
 
-            const textForPrompt = extractedText ? extractedText.slice(0, 4000) : '（暂无文档，请生成一道生物选择题）';
+    const maxChars = 3000; // 减少文档长度，提高响应速度
+    const textForPrompt = extractedText ? extractedText.slice(0, maxChars) : '（暂无文档，请生成一道生物选择题）';
 
-            const prompt = `
-                    你是一个教育专家。请根据以下文档内容，生成 ${count} 道 ${diff} 难度的${type}。
-                    ${typeInstruction}
-                    要求：
-                    1. 每个题目包含：题干、4个选项（A、B、C、D）、正确答案、解析。
-                    2. 输出格式为 JSON 数组，每个对象包含："question", "options", "answer", "explanation"。
-                    3. 只输出 JSON，不要包含任何额外解释。
-                    文档内容如下：
-                    ${textForPrompt}
-                `;
+    const prompt = `
+        你是一个教育专家。请根据以下文档内容，生成 ${count} 道 ${diff} 难度的${type}。
+        ${typeInstruction}
+        要求：
+        1. 每个题目包含：题干、4个选项（A、B、C、D）、正确答案、解析。
+        2. 输出格式为 JSON 数组，每个对象包含："question", "options", "answer", "explanation"。
+        3. 只输出 JSON，不要包含任何额外解释。
+        文档内容如下：
+        ${textForPrompt}
+    `;
 
+    // --- 调用后端代理 API ---
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30秒超时
+
+        // ✅ 这里改成了调用你的后端，而不是直接调用豆包
+        const response = await fetch(`${API_BASE_URL}/generate-question`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}` // 需要登录后的 Token
+            },
+            body: JSON.stringify({
+                prompt: prompt,
+                count: count,
+                diff: diff,
+                type: type
+            }),
+            signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+            let errMsg = `后端代理请求失败 (${response.status})`;
             try {
-                const response = await fetch(LLM_API_BASE, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${LLM_API_KEY}`
-                    },
-                    body: JSON.stringify({
-                        model: LLM_MODEL_ID,
-                        messages: [
-                            { role: 'system', content: '你是一个专业的教育出题助手，只输出 JSON 格式。' },
-                            { role: 'user', content: prompt }
-                        ],
-                        temperature: 0.7,
-                        max_tokens: 4000
-                    })
-                });
-
-                if (!response.ok) {
-                    let errMsg = `API 请求失败 (${response.status})`;
-                    try {
-                        const errData = await response.json();
-                        if (errData.error) {
-                            errMsg += ': ' + errData.error;
-                        }
-                    } catch (_) {}
-                    throw new Error(errMsg);
-                }
-
-                const data = await response.json();
-                const content = data.choices?.[0]?.message?.content || '';
-
-                let jsonStr = content.trim();
-                jsonStr = jsonStr.replace(/```json?/g, '').replace(/```/g, '').trim();
-
-                let questions = JSON.parse(jsonStr);
-                if (!Array.isArray(questions) || questions.length === 0) {
-                    throw new Error('AI 生成的题目为空');
-                }
-
-                questions = questions.filter(q => q.question && q.options && q.answer);
-                generatedQuestions = questions;
-                renderQuestions(questions);
-                updateFileList();
-                showToastMsg(`✅ 成功生成 ${questions.length} 道题目！`, 'success');
-
-                // 加入习题总库
-                libraryData = libraryData.concat(questions.map(q => ({ ...q, date: new Date().toISOString().slice(0, 10) })));
-                renderLibrary();
-
-            } catch (err) {
-                console.error(err);
-                showToastMsg('❌ 生成失败：' + err.message, 'error');
-            } finally {
-                generateBtn.disabled = false;
-                generateBtn.innerHTML = '🚀 生成题目';
-            }
+                const errData = await response.json();
+                if (errData.error) errMsg += ': ' + errData.error;
+            } catch (_) {}
+            throw new Error(errMsg);
         }
 
+        // --- 获取原始文本并清理 ---
+        const rawText = await response.text();
+        let jsonStr = rawText.trim();
+        // 去除可能的 Markdown 标记
+        if (jsonStr.startsWith('```json')) jsonStr = jsonStr.slice(7);
+        else if (jsonStr.startsWith('```')) jsonStr = jsonStr.slice(3);
+        if (jsonStr.endsWith('```')) jsonStr = jsonStr.slice(0, -3);
+        jsonStr = jsonStr.trim();
+
+        // --- 解析 JSON ---
+        let questions = JSON.parse(jsonStr);
+        if (!Array.isArray(questions) || questions.length === 0) {
+            throw new Error('AI 返回的题目为空');
+        }
+
+        questions = questions.filter(q => q.question && q.options && q.answer);
+        if (questions.length === 0) {
+            throw new Error('AI 返回的题目格式不正确');
+        }
+
+        generatedQuestions = questions;
+        renderQuestions(questions);
+        updateFileList();
+        showToastMsg(`✅ 成功生成 ${questions.length} 道题目！`, 'success');
+
+    } catch (err) {
+        console.error('生成失败:', err);
+        if (err.name === 'AbortError') {
+            showToastMsg('⏱️ 生成超时，请减少文档长度或重试', 'error');
+        } else {
+            showToastMsg('❌ 生成失败：' + err.message, 'error');
+        }
+    } finally {
+        generateBtn.disabled = false;
+        generateBtn.innerHTML = '🚀 生成题目';
+        if (generatedQuestions.length > 0) {
+            submitBtn.style.display = 'inline-flex';
+        }
+    }
+}
         generateBtn.addEventListener('click', generateQuestions);
 
         // ---------- 渲染题目 ----------
