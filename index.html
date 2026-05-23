@@ -1578,59 +1578,35 @@ async function generateQuestions() {
         }
 
 // --- 获取并解析返回数据 ---
-const rawText = await response.text();
-console.log('原始响应:', rawText); // 调试用
+const data = await response.json();
+console.log('完整响应:', data); // 调试用
 
-let jsonStr = rawText.trim();
-
-// 去除 Markdown 标记
-if (jsonStr.startsWith('```json')) jsonStr = jsonStr.slice(7);
-else if (jsonStr.startsWith('```')) jsonStr = jsonStr.slice(3);
-if (jsonStr.endsWith('```')) jsonStr = jsonStr.slice(0, -3);
-jsonStr = jsonStr.trim();
-
-// --- 解析 API 返回的数据（兼容数组和单题对象） ---
-let questions = [];
-
-try {
-    const parsed = JSON.parse(jsonStr);
-    
-    // 情况1：AI 返回的是一个数组
-    if (Array.isArray(parsed)) {
-        questions = parsed;
-    }
-    // 情况2：AI 返回的是单个对象（你截图里的情况）
-    else if (typeof parsed === 'object' && parsed !== null) {
-        const single = parsed;
-        // 兼容中英文键名
-        const qText = single['题目'] || single['question'];
-        const qOptions = single['选项'] || single['options'];
-        const qAnswer = single['答案'] || single['answer'];
-        const qExplanation = single['解析'] || single['explanation'];
-        
-        if (qText && qOptions && qAnswer) {
-            // 将选项对象转换为字符串数组
-            let optionsArray = [];
-            if (typeof qOptions === 'object' && !Array.isArray(qOptions)) {
-                optionsArray = Object.entries(qOptions).map(([key, value]) => `${key}. ${value}`);
-            } else if (Array.isArray(qOptions)) {
-                optionsArray = qOptions;
-            }
-            
-            questions.push({
-                question: qText,
-                options: optionsArray,
-                answer: qAnswer,
-                explanation: qExplanation || ''
-            });
-        }
-    }
-} catch (e) {
-    console.error('解析失败:', e);
-    throw new Error('无法解析 AI 返回的数据');
+// 1. 直接读取 content 字段（它里面已经是一个 JSON 数组的字符串形式）
+let content = data.choices?.[0]?.message?.content;
+if (!content || content.trim() === '') {
+    console.error('choices[0].message.content 为空:', data);
+    throw new Error('AI 返回的内容为空');
 }
 
-// --- 验证解析结果 ---
+console.log('content内容:', content); // 调试用
+
+// 2. 直接解析这个 content 字符串，它本身就是一个 JSON 数组
+let questions = [];
+try {
+    // 直接解析，因为 content 已经是 "[\n  {\n    \"question\": ...\n  }\n]" 这种格式
+    questions = JSON.parse(content);
+} catch (e) {
+    console.error('直接解析失败，尝试清理 Markdown:', e);
+    // 如果直接解析失败，再尝试清理 Markdown 标记
+    let jsonStr = content.trim();
+    if (jsonStr.startsWith('```json')) jsonStr = jsonStr.slice(7);
+    else if (jsonStr.startsWith('```')) jsonStr = jsonStr.slice(3);
+    if (jsonStr.endsWith('```')) jsonStr = jsonStr.slice(0, -3);
+    jsonStr = jsonStr.trim();
+    questions = JSON.parse(jsonStr);
+}
+
+// 3. 验证解析结果
 if (!Array.isArray(questions) || questions.length === 0) {
     console.error('解析后的数据:', questions);
     throw new Error('AI 返回的题目为空');
