@@ -1502,22 +1502,7 @@ document.getElementById('genUsersBtn').addEventListener('click', async () => {
         loginOverlay.style.display = 'none';
     }
 })();
-(async function() {
-    const user = await verifyToken();
-    if (user) {
-        currentUser = user;
-        loginOverlay.style.display = 'none';
-        // 加载用户数据
-        await loadMistakes();
-        await loadCollections();
-        if (user.role === 'admin' || user.username === 'liufeichang') {
-            document.getElementById('showAdminGen').style.display = 'inline-block';
-        }
-    } else {
-        // 游客模式：直接隐藏登录弹窗
-        loginOverlay.style.display = 'none';
-    }
-})();
+
 </script>
 </body>
 </html>
