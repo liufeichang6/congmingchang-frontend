@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>聪明肠 · 智能学习平台</title>
+    <title>聪明肠 · 聪明蛋平台</title>
     <script src="https://unpkg.com/mammoth@1.6.0/mammoth.browser.min.js">
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
@@ -1625,7 +1625,7 @@ renderQuestions(questions);
     } catch (err) {
         console.error('生成失败:', err);
         if (err.name === 'AbortError') {
-            showToastMsg('⏱️ 生成超时，请减少文档长度或重试', 'error');
+            showToastMsg(' 生成超时，请减少文档长度或重试', 'error');
         } else {
             showToastMsg('❌ 生成失败：' + err.message, 'error');
         }
@@ -1802,7 +1802,7 @@ renderQuestions(questions);
             } else if (allCorrect) {
                 showToastMsg(' 全部正确！继续加油！', 'success');
             } else {
-                showToastMsg('📝 已显示所有题目的答案和解析，请查看', 'info');
+                showToastMsg(' 已显示所有题目的答案和解析，请查看', 'info');
             }
             allAnswersRevealed = true;
         }
@@ -1815,7 +1815,7 @@ renderQuestions(questions);
             if (!exists) {
                 mistakes.push({ ...question, category: '默认', redoCount: 0, correctCount: 0 });
                 localStorage.setItem(`mistake_book_${currentUser.id}`, JSON.stringify(mistakes));
-                showToastMsg('📝 已收录到错题本', 'info');
+                showToastMsg(' 已收录到错题本', 'info');
             }
         }
 
@@ -1847,17 +1847,17 @@ renderQuestions(questions);
                             <div class="mistake-content">
                                 <div class="q-text">${q.question}</div>
                                 <div class="q-meta">
-                                    <span>✅ 正确答案：${answerText}</span>
-                                    <span>📖 ${q.explanation}</span>
-                                    <span>📁 来源：${q.source || '未知'}</span>
-                                    <span>📅 ${q.date || '未知'}</span>
-                                    <span>🏷️ 分类：<span class="category-tag" onclick="editCategory(${idx})">${category}</span></span>
-                                    <span>🔄 重做 ${redoCount} 次，正确率 ${rate}%</span>
+                                    <span> 正确答案：${answerText}</span>
+                                    <span> ${q.explanation}</span>
+                                    <span> 来源：${q.source || '未知'}</span>
+                                    <span> ${q.date || '未知'}</span>
+                                    <span> 分类：<span class="category-tag" onclick="editCategory(${idx})">${category}</span></span>
+                                    <span> 重做 ${redoCount} 次，正确率 ${rate}%</span>
                                 </div>
                             </div>
                             <div class="mistake-actions">
                                 <button class="btn-outline btn-sm" onclick="deleteMistake(${idx})">🗑️ 删除</button>
-                                <button class="btn-primary btn-sm" onclick="redoMistake(${idx})">🔄 重做</button>
+                                <button class="btn-primary btn-sm" onclick="redoMistake(${idx})"> 重做</button>
                             </div>
                         </div>
                     `;
@@ -1882,7 +1882,7 @@ renderQuestions(questions);
             }
             localStorage.setItem(`mistake_book_${currentUser.id}`, JSON.stringify(mistakeData));
             renderMistakes();
-            showToastMsg('🔄 已重做', 'info');
+            showToastMsg(' 已重做', 'info');
         }
 
         function editCategory(index) {
@@ -1913,7 +1913,7 @@ renderQuestions(questions);
                 const idx = parseInt(cb.dataset.index);
                 redoMistake(idx);
             });
-            showToastMsg(`🔄 已重做 ${checked.length} 道错题`, 'success');
+            showToastMsg(` 已重做 ${checked.length} 道错题`, 'success');
         });
         exportMistakeBtn.addEventListener('click', () => {
             if (mistakeData.length === 0) {
@@ -1934,7 +1934,7 @@ renderQuestions(questions);
             a.download = `错题本_${new Date().toISOString().slice(0,10)}.txt`;
             a.click();
             URL.revokeObjectURL(url);
-            showToastMsg('✅ 错题本导出成功', 'success');
+            showToastMsg(' 错题本导出成功', 'success');
         });
 
         // ---------- 薄弱知识点 ----------
@@ -1997,7 +1997,7 @@ renderQuestions(questions);
             ];
             renderQuestions(qs);
             switchPage('generate');
-            showToastMsg(`🎯 已根据 "${w.title}" 生成 3 道题目`, 'success');
+            showToastMsg(` 已根据 "${w.title}" 生成 3 道题目`, 'success');
         }
 
         function deleteWeakness(index) {
@@ -2025,7 +2025,7 @@ renderQuestions(questions);
             }
             renderQuestions(qs);
             switchPage('generate');
-            showToastMsg('🎯 已根据薄弱知识点生成 5 道题目', 'success');
+            showToastMsg(' 已根据薄弱知识点生成 5 道题目', 'success');
         });
 
         // ---------- 口诀题目 ----------
@@ -2073,12 +2073,12 @@ renderQuestions(questions);
         function searchMnemonic(idx) {
             const m = mnemonicData[idx];
             if (!m) return;
-            showToastMsg(`🔍 正在搜索 "${m.text}" 的含义...`, 'info');
+            showToastMsg(` 正在搜索 "${m.text}" 的含义...`, 'info');
             setTimeout(() => {
                 m.meaning = `"${m.text}" 是医学中常用的记忆口诀，帮助记忆复杂知识点。`;
                 localStorage.setItem(`mnemonic_${currentUser.id}`, JSON.stringify(mnemonicData));
                 renderMnemonics();
-                showToastMsg(`✅ 已获取含义：${m.meaning}`, 'success');
+                showToastMsg(` 已获取含义：${m.meaning}`, 'success');
             }, 1000);
         }
 
@@ -2117,7 +2117,7 @@ renderQuestions(questions);
             }));
             renderQuestions(qs);
             switchPage('generate');
-            showToastMsg('📝 已根据口诀生成 4 道题目', 'success');
+            showToastMsg(' 已根据口诀生成 4 道题目', 'success');
         });
 
         // ---------- 习题总库 ----------
@@ -2221,7 +2221,7 @@ renderQuestions(questions);
                     body: JSON.stringify({ userId: currentUser.id, newPassword: pwd })
                 });
                 if (response.ok) {
-                    showToastMsg('✅ 密码修改成功', 'success');
+                    showToastMsg(' 密码修改成功', 'success');
                     newPassword.value = '';
                     confirmNewPassword.value = '';
                 } else {
@@ -2239,7 +2239,7 @@ renderQuestions(questions);
                 return;
             }
             // 模拟提交意见
-            showToastMsg('✅ 意见已提交，感谢您的反馈！', 'success');
+            showToastMsg(' 意见已提交，感谢您的反馈！', 'success');
             feedbackContent.value = '';
         });
 
@@ -2357,7 +2357,7 @@ renderQuestions(questions);
                 });
             });
             renderAdminUsers();
-            showToastMsg(`✅ 已生成 ${results.length} 个账号`, 'success');
+            showToastMsg(` 已生成 ${results.length} 个账号`, 'success');
             // 清空输入
             singleUsername.value = '';
             singlePassword.value = '';
@@ -2540,7 +2540,7 @@ renderQuestions(questions);
             a.download = `习题集_${new Date().toISOString().slice(0,10)}.txt`;
             a.click();
             URL.revokeObjectURL(url);
-            showToastMsg('✅ 导出成功！', 'success');
+            showToastMsg(' 导出成功！', 'success');
         });
 
         // ---------- 清空结果 ----------
@@ -2571,7 +2571,7 @@ renderQuestions(questions);
             } else {
                 loginOverlay.style.display = 'none';
             }
-            console.log('🧠 聪明肠 · 智能学习平台已启动');
+            console.log('🧠 聪明肠 · 聪明蛋平台已启动');
         })();
 
         // ---------- 显示时机设置 ----------
@@ -2599,7 +2599,7 @@ renderQuestions(questions);
         window.unbanUser = unbanUser;
         window.deleteUser = deleteUser;
 
-        console.log('✅ 所有功能已就绪');
+        console.log(' 所有功能已就绪');
     </script>
 
 </body>
