@@ -1653,67 +1653,106 @@ renderQuestions(questions);
         generateBtn.addEventListener('click', generateQuestions);
 
         // ---------- 渲染题目 ----------
-        function renderQuestions(questions) {
-            if (!questions || questions.length === 0) {
-                questionDisplayArea.style.display = 'none';
-                return;
-            }
+// ---------- 渲染题目 ----------
+function renderQuestions(questions) {
+    if (!questions || questions.length === 0) {
+        questionDisplayArea.style.display = 'none';
+        return;
+    }
 
-            questionDisplayArea.style.display = 'block';
-            resultCount.textContent = `${questions.length} 题`;
+    questionDisplayArea.style.display = 'block';
+    resultCount.textContent = `${questions.length} 题`;
 
-            let html = '';
-            questions.forEach((q, idx) => {
-                const number = idx + 1;
-                const isMulti = Array.isArray(q.answer) && q.answer.length > 1;
-                const inputType = isMulti ? 'checkbox' : 'radio';
-                const name = `q_${idx}`;
+    let html = '';
+    questions.forEach((q, idx) => {
+        const number = idx + 1;
+        const isMulti = Array.isArray(q.answer) && q.answer.length > 1;
+        const inputType = isMulti ? 'checkbox' : 'radio';
+        const name = `q_${idx}`;
 
-                let optionsHtml = q.options.map((opt, oi) => {
-                    const label = String.fromCharCode(65 + oi);
-                    return `
-                            <label class="option" style="display:block;padding:4px 0;cursor:pointer;font-size:14px;">
-                                <input type="${inputType}" name="${name}" value="${label}" style="margin-right:8px;" data-index="${idx}" data-value="${label}">
-                                ${label}. ${opt.replace(/^[A-D]\.\s*/, '')}
-                            </label>
-                        `;
-                }).join('');
-
-                const showPerQuestionBtn = answerDisplayMode === 'perQuestion';
-
-                html += `
-                        <div class="question-item" data-index="${idx}" style="background:#f8fafc;border-radius:14px;padding:18px 22px;margin-bottom:14px;border:1px solid #e9edf2;">
-                            <div style="font-weight:600;margin-bottom:8px;"><span style="color:#1e40af;">${number}.</span> ${q.question}</div>
-                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;padding-left:4px;">${optionsHtml}</div>
-                            <div class="action-area" style="margin-top:10px;">
-                                ${showPerQuestionBtn ? `<button class="btn btn-primary btn-sm check-single-btn" data-index="${idx}">检查本题</button>` : ''}
-                                <div id="answerFeedback_${idx}" style="display:none;margin-top:10px;padding:8px 14px;background:#eef2ff;border-radius:8px;font-size:14px;">
-                                    <span style="font-weight:600;color:#1e40af;">✅ 答案：</span><span id="answerText_${idx}"></span>
-                                    <span style="color:#64748b;margin-left:12px;">📖 </span><span id="explanationText_${idx}"></span>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-            });
-
-            questionList.innerHTML = html;
-
-            document.querySelectorAll('.check-single-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const idx = parseInt(this.dataset.index);
-                    checkSingleAnswer(idx);
-                });
-            });
-
-            if (answerDisplayMode === 'afterAll') {
-                submitBtn.style.display = 'inline-flex';
-                submitBtn.onclick = function() {
-                    checkAllAnswers();
-                };
+        // ===== 🛡️ 核心修复：确保 options 是数组 =====
+        let options = q.options;
+        // 1. 如果不是数组，尝试修复
+        if (!Array.isArray(options)) {
+            console.warn(`题目 ${idx+1} 的 options 格式不正确，尝试修复:`, options);
+            // 如果是字符串，尝试按逗号、换行或空格分割
+            if (typeof options === 'string') {
+                // 先移除 "A. " "B. " 等前缀（如果存在）
+                let cleanStr = options.replace(/[A-D][.\s]+/g, ''); 
+                // 尝试按换行或逗号分割
+                let splitOptions = cleanStr.split(/[\n,，]+/).map(s => s.trim()).filter(s => s.length > 0);
+                if (splitOptions.length >= 2) {
+                    options = splitOptions;
+                } else {
+                    // 如果分割后选项不足，尝试按空格分割（可能是 "A B C D" 格式）
+                    splitOptions = options.split(/\s+/).filter(s => s.length > 0);
+                    if (splitOptions.length >= 2) {
+                        options = splitOptions;
+                    } else {
+                        // 实在无法解析，使用默认占位选项
+                        options = ['A. 选项A', 'B. 选项B', 'C. 选项C', 'D. 选项D'];
+                    }
+                }
             } else {
-                submitBtn.style.display = 'none';
+                // 如果是 null 或 undefined 或其他类型，直接使用默认占位选项
+                options = ['A. 数据异常', 'B. 数据异常', 'C. 数据异常', 'D. 数据异常'];
             }
         }
+        // 2. 确保至少有 2 个选项，不够的话补齐
+        while (options.length < 2) {
+            options.push(`选项 ${options.length + 1}`);
+        }
+        // 如果选项超过 4 个，只取前 4 个（题目通常只要 4 个）
+        if (options.length > 4) {
+            options = options.slice(0, 4);
+        }
+        // ===== 🛡️ 修复结束 =====
+
+        let optionsHtml = options.map((opt, oi) => {
+            const label = String.fromCharCode(65 + oi);
+            return `
+                <label class="option" style="display:block;padding:4px 0;cursor:pointer;font-size:14px;">
+                    <input type="${inputType}" name="${name}" value="${label}" style="margin-right:8px;" data-index="${idx}" data-value="${label}">
+                    ${label}. ${opt.replace(/^[A-D]\.\s*/, '')}
+                </label>
+            `;
+        }).join('');
+
+        const showPerQuestionBtn = answerDisplayMode === 'perQuestion';
+
+        html += `
+            <div class="question-item" data-index="${idx}" style="background:#f8fafc;border-radius:14px;padding:18px 22px;margin-bottom:14px;border:1px solid #e9edf2;">
+                <div style="font-weight:600;margin-bottom:8px;"><span style="color:#1e40af;">${number}.</span> ${q.question}</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;padding-left:4px;">${optionsHtml}</div>
+                <div class="action-area" style="margin-top:10px;">
+                    ${showPerQuestionBtn ? `<button class="btn btn-primary btn-sm check-single-btn" data-index="${idx}">检查本题</button>` : ''}
+                    <div id="answerFeedback_${idx}" style="display:none;margin-top:10px;padding:8px 14px;background:#eef2ff;border-radius:8px;font-size:14px;">
+                        <span style="font-weight:600;color:#1e40af;">✅ 答案：</span><span id="answerText_${idx}"></span>
+                        <span style="color:#64748b;margin-left:12px;">📖 </span><span id="explanationText_${idx}"></span>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    questionList.innerHTML = html;
+
+    document.querySelectorAll('.check-single-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const idx = parseInt(this.dataset.index);
+            checkSingleAnswer(idx);
+        });
+    });
+
+    if (answerDisplayMode === 'afterAll') {
+        submitBtn.style.display = 'inline-flex';
+        submitBtn.onclick = function() {
+            checkAllAnswers();
+        };
+    } else {
+        submitBtn.style.display = 'none';
+    }
+}
 
         // ---------- 检查单题 ----------
         function checkSingleAnswer(index) {
