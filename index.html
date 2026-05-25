@@ -1692,7 +1692,7 @@ async function generatePaper() {
     }
 
     // 识别章节
-// ========== AI辅助章节识别（1次API调用，极速精准） ==========
+// ========== AI辅助章节识别（含 60 秒超时） ==========
 async function detectChapters(text) {
     // 1. 快速规则分割（基于常见章节标记）
     const patterns = [
@@ -1705,7 +1705,6 @@ async function detectChapters(text) {
         /Section\s+[0-9]+/gi
     ];
     
-    // 在文本中查找所有匹配的章节标记位置
     let positions = [];
     for (let pattern of patterns) {
         let match;
@@ -1717,81 +1716,54 @@ async function detectChapters(text) {
             });
         }
     }
-    
-    // 按位置排序
     positions.sort((a, b) => a.index - b.index);
     
-    // 2. 根据标记位置分割章节
     let chapters = [];
     let lastEnd = 0;
     for (let i = 0; i < positions.length; i++) {
         const pos = positions[i];
-        // 如果两个标记太近（<100字符），视为同一个章节
-        if (i > 0 && pos.index - positions[i-1].index < 100) {
-            continue;
-        }
+        if (i > 0 && pos.index - positions[i-1].index < 100) continue;
         const start = pos.index;
         const title = pos.text;
-        // 提取从上一个标记结束到当前标记开始之间的内容
         const content = text.slice(lastEnd, start).trim();
         if (content) {
-            chapters.push({
-                title: '（未命名章节）',
-                content: content
-            });
+            chapters.push({ title: '（未命名章节）', content: content });
         }
-        // 当前章节的标题和内容（从当前标记到下一个标记）
         const end = i < positions.length - 1 ? positions[i+1].index : text.length;
         const chapterContent = text.slice(start, end).trim();
-        chapters.push({
-            title: title,
-            content: chapterContent
-        });
+        chapters.push({ title: title, content: chapterContent });
         lastEnd = end;
     }
-    // 剩余内容
     if (lastEnd < text.length) {
         const remaining = text.slice(lastEnd).trim();
-        if (remaining) {
-            chapters.push({
-                title: '（未命名章节）',
-                content: remaining
-            });
-        }
+        if (remaining) chapters.push({ title: '（未命名章节）', content: remaining });
     }
-    
-    // 如果检测到的章节太少（<3），把整个文档当作一个章节
     if (chapters.length < 3) {
         return [{ title: '全文', content: text }];
     }
     
-    // 3. AI批量校准（只取每个章节的前3行作为标题候选）
-    // 为了节省token，只发送前3行和章节长度
+    // 2. AI批量校准
     let chapterCandidates = chapters.map((ch, idx) => {
         const lines = ch.content.split('\n');
         const head = lines.slice(0, 3).join('\n').slice(0, 200);
-        return {
-            id: idx,
-            title: ch.title,
-            head: head,
-            length: ch.content.length
-        };
+        return { id: idx, title: ch.title, head: head, length: ch.content.length };
     });
     
     const prompt = `
         你是一个文档结构分析专家。我发给你一个文档的章节分割结果（共 ${chapters.length} 个块），每个块有一个候选标题和开头的几行内容。
         请判断每个块是否真的是一个独立的章节。
-        
         输出格式：JSON数组，每个对象包含：
         - "id": 块序号
-        - "isChapter": true/false（是否是真的章节）
+        - "isChapter": true/false
         - "standardTitle": 如果isChapter为true，给出标准化的章节名称（如"第一章 绪论"）；如果为false，写"无"
-        
         只输出JSON，不要包含任何额外解释。
-        
         章节候选列表：
         ${JSON.stringify(chapterCandidates, null, 2)}
     `;
+    
+    // 🛡️ 这里添加了 60 秒超时控制
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 秒超时
     
     try {
         const response = await fetch(LLM_API_BASE, {
@@ -1808,8 +1780,11 @@ async function detectChapters(text) {
                 ],
                 temperature: 0.3,
                 max_tokens: 2000
-            })
+            }),
+            signal: controller.signal  // 👈 关联 AbortController
         });
+        
+        clearTimeout(timeoutId); // 请求成功，清除超时计时器
         
         const data = await response.json();
         let content = data.choices?.[0]?.message?.content;
@@ -1823,27 +1798,20 @@ async function detectChapters(text) {
         
         const aiResults = JSON.parse(jsonStr);
         
-        // 4. 根据AI结果合并或修正
         let finalChapters = [];
         let currentChapter = null;
-        
         for (let i = 0; i < chapters.length; i++) {
             const ai = aiResults.find(r => r.id === i);
             if (ai && ai.isChapter) {
-                // 这是一个真正的章节
-                if (currentChapter) {
-                    finalChapters.push(currentChapter);
-                }
+                if (currentChapter) finalChapters.push(currentChapter);
                 currentChapter = {
                     title: ai.standardTitle || chapters[i].title,
                     content: chapters[i].content
                 };
             } else {
-                // 不是章节，合并到当前章节
                 if (currentChapter) {
                     currentChapter.content += '\n\n' + chapters[i].content;
                 } else {
-                    // 如果还没有任何章节，先创建
                     currentChapter = {
                         title: '（未命名章节）',
                         content: chapters[i].content
@@ -1851,19 +1819,20 @@ async function detectChapters(text) {
                 }
             }
         }
-        if (currentChapter) {
-            finalChapters.push(currentChapter);
-        }
-        
-        // 如果最终章节太少，回退到简单分割
+        if (currentChapter) finalChapters.push(currentChapter);
         if (finalChapters.length < 2) {
             return chapters.map(c => ({ title: c.title, content: c.content }));
         }
-        
         return finalChapters;
         
     } catch (err) {
-        console.error('AI章节识别失败，使用规则分割结果:', err);
+        clearTimeout(timeoutId);
+        if (err.name === 'AbortError') {
+            console.error('AI章节识别超时 (60秒)');
+            showToastMsg('⏱️ 章节识别超时，请检查网络或重试', 'error');
+        } else {
+            console.error('AI章节识别失败，使用规则分割结果:', err);
+        }
         return chapters.map(c => ({ title: c.title, content: c.content }));
     }
 }
