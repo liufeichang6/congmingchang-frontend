@@ -1989,19 +1989,21 @@ function renderMistakes() {
                         </div>
                     </div>
                     
-                    ${hasWeakness ? `
-                        <div style="margin-top:12px;padding:8px 14px;background:#f1f7fe;border-radius:8px;cursor:pointer;" onclick="toggleWeaknessSummary(${idx})">
-                            <div style="display:flex;justify-content:space-between;align-items:center;">
-                                <span style="font-size:14px;font-weight:500;">💡 薄弱知识点：${q.weakness.title}</span>
-                                <i class="fas fa-chevron-down" id="weaknessArrow_${idx}"></i>
-                            </div>
-                            <div id="weaknessDetail_${idx}" style="display:none;margin-top:8px;padding:8px 12px;background:#fff;border-radius:6px;font-size:14px;color:#475569;">
-                                <strong>详细描述：</strong>${q.weakness.description}<br>
-                                <strong>核心要点：</strong>${q.weakness.keyPoints}<br>
-                                <button class="btn-primary btn-sm" onclick="generateFromWeaknessDetail('${q.weakness.title}')" style="margin-top:6px;">🎯 基于此知识点出题</button>
-                            </div>
-                        </div>
-                    ` : `
+${hasWeakness ? `
+    <div style="margin-top:12px;padding:8px 14px;background:#f1f7fe;border-radius:8px;cursor:pointer;" onclick="toggleWeaknessSummary(${idx})">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:14px;font-weight:500;">💡 薄弱知识点：${q.weakness.title}</span>
+            <i class="fas fa-chevron-down" id="weaknessArrow_${idx}"></i>
+        </div>
+        <div id="weaknessDetail_${idx}" style="display:none;margin-top:8px;padding:8px 12px;background:#fff;border-radius:6px;font-size:14px;color:#475569;">
+            <strong>详细描述：</strong>${q.weakness.description}<br>
+            <strong>核心要点：</strong>${q.weakness.keyPoints}<br>
+            <button class="btn-primary btn-sm" onclick="generateFromWeaknessDetail(${idx})" style="margin-top:6px;">🎯 基于此知识点出题</button>
+            <!-- 👇 新增：题目生成区域 -->
+            <div id="weaknessQuestionArea_${idx}" style="margin-top:12px;display:none;"></div>
+        </div>
+    </div>
+` : `
                         <div style="margin-top:8px;color:#94a3b8;font-size:13px;">
                             <i class="far fa-clock"></i> 尚未生成薄弱知识点，点击上方「AI分析薄弱点」生成
                         </div>
@@ -2377,29 +2379,32 @@ function toggleWeaknessSummary(index) {
     }
 }
 
-async function generateFromWeaknessDetail(topic) {
-    // 找到对应的薄弱知识点
-    let weakness = null;
-    for (const w of weaknessData) {
-        if (w.title === topic) {
-            weakness = w;
-            break;
-        }
-    }
-    if (!weakness) {
-        showToastMsg('⚠️ 未找到该知识点', 'error');
+// 在错题本中生成一道题（不跳转页面）
+async function generateFromWeaknessDetail(index) {
+    // 获取错题项和知识点
+    const q = mistakeData[index];
+    if (!q || !q.weakness) {
+        showToastMsg('⚠️ 未找到对应的薄弱知识点', 'error');
         return;
     }
     
-    // 调用大模型生成题目
+    const weakness = q.weakness;
+    const container = document.getElementById(`weaknessQuestionArea_${index}`);
+    if (!container) {
+        showToastMsg('⚠️ 页面错误：找不到题目容器', 'error');
+        return;
+    }
+    
+    // 防止重复点击
     const btn = event.target;
     if (btn.disabled) return;
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span> 生成中...';
     
     try {
+        // 调用大模型生成一道题（只生成1道）
         const prompt = `
-            你是一个教育专家。请根据以下薄弱知识点，生成 3 道相关题目（含选择题），帮助巩固该知识点。
+            你是一个教育专家。请根据以下薄弱知识点，生成 1 道单选题，帮助巩固该知识点。
             
             薄弱知识点：
             标题：${weakness.title}
@@ -2407,8 +2412,8 @@ async function generateFromWeaknessDetail(topic) {
             核心要点：${weakness.keyPoints}
             
             要求：
-            1. 每道题为单选题，有4个选项（A、B、C、D）
-            2. 输出格式为 JSON 数组，每个对象包含："question", "options", "answer", "explanation"
+            1. 只生成 1 道单选题，有4个选项（A、B、C、D）
+            2. 输出格式为 JSON 数组，数组中有 1 个对象，包含："question", "options", "answer", "explanation"
             3. 只输出 JSON，不要包含任何额外解释
         `;
         
@@ -2425,7 +2430,7 @@ async function generateFromWeaknessDetail(topic) {
                     { role: 'user', content: prompt }
                 ],
                 temperature: 0.7,
-                max_tokens: 3000
+                max_tokens: 2000
             })
         });
         
@@ -2449,9 +2454,75 @@ async function generateFromWeaknessDetail(topic) {
             throw new Error('AI 返回的题目为空');
         }
         
-        renderQuestions(questions);
-        switchPage('generate');
-        showToastMsg(`🎯 已根据 "${weakness.title}" 生成 ${questions.length} 道题目`, 'success');
+        const question = questions[0];
+        if (!question.question || !question.options || !question.answer) {
+            throw new Error('AI 返回的题目格式不正确');
+        }
+        
+        // 确保 options 是数组
+        let options = question.options;
+        if (!Array.isArray(options)) {
+            if (typeof options === 'object' && options !== null) {
+                const orderedKeys = ['A', 'B', 'C', 'D'];
+                let newOptions = [];
+                for (const key of orderedKeys) {
+                    if (options[key] !== undefined) {
+                        newOptions.push(options[key]);
+                    }
+                }
+                if (newOptions.length === 0) {
+                    newOptions = Object.values(options);
+                }
+                options = newOptions.length >= 2 ? newOptions : ['选项A', '选项B', '选项C', '选项D'];
+            } else if (typeof options === 'string') {
+                let cleanStr = options.replace(/[A-D][.\s]+/g, '');
+                let splitOptions = cleanStr.split(/[\n,，]+/).map(s => s.trim()).filter(s => s.length > 0);
+                if (splitOptions.length >= 2) {
+                    options = splitOptions;
+                } else {
+                    options = ['选项A', '选项B', '选项C', '选项D'];
+                }
+            } else {
+                options = ['选项A', '选项B', '选项C', '选项D'];
+            }
+        }
+        while (options.length < 2) {
+            options.push(`选项 ${options.length + 1}`);
+        }
+        if (options.length > 4) {
+            options = options.slice(0, 4);
+        }
+        
+        // 构建题目 HTML
+        const answerText = Array.isArray(question.answer) ? question.answer.join('、') : question.answer;
+        const optionsHtml = options.map((opt, oi) => {
+            const label = String.fromCharCode(65 + oi);
+            return `
+                <label style="display:block;padding:4px 0;cursor:pointer;font-size:14px;">
+                    <input type="radio" name="weakness_q_${index}" value="${label}" style="margin-right:8px;">
+                    ${label}. ${opt.replace(/^[A-D]\.\s*/, '')}
+                </label>
+            `;
+        }).join('');
+        
+        // 渲染到容器
+        container.style.display = 'block';
+        container.innerHTML = `
+            <div style="background:#f8fafc;border-radius:14px;padding:18px 22px;border:1px solid #e9edf2;margin-top:8px;">
+                <div style="font-weight:600;margin-bottom:8px;">📝 ${question.question}</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;padding-left:4px;">${optionsHtml}</div>
+                <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;">
+                    <button class="btn-primary btn-sm" onclick="checkWeaknessAnswer(${index})">✅ 查看答案</button>
+                    <button class="btn-outline btn-sm" onclick="closeWeaknessQuestion(${index})">✕ 收起</button>
+                </div>
+                <div id="weaknessAnswerFeedback_${index}" style="display:none;margin-top:10px;padding:8px 14px;background:#eef2ff;border-radius:8px;font-size:14px;">
+                    <span style="font-weight:600;color:#1e40af;">✅ 正确答案：</span><span style="color:#16a34a;font-weight:600;">${answerText}</span>
+                    <br><span style="color:#64748b;">📖 ${question.explanation || '无解析'}</span>
+                </div>
+            </div>
+        `;
+        
+        showToastMsg(`✅ 已生成一道关于 "${weakness.title}" 的题目`, 'success');
         
     } catch (err) {
         console.error('出题失败:', err);
@@ -2461,6 +2532,36 @@ async function generateFromWeaknessDetail(topic) {
         btn.innerHTML = '🎯 基于此知识点出题';
     }
 }
+// 检查错题本中生成的题目的答案
+function checkWeaknessAnswer(index) {
+    const container = document.getElementById(`weaknessQuestionArea_${index}`);
+    if (!container) return;
+    
+    const selected = container.querySelector('input[type="radio"]:checked');
+    if (!selected) {
+        showToastMsg('请先选择一个选项', 'info');
+        return;
+    }
+    
+    const feedback = document.getElementById(`weaknessAnswerFeedback_${index}`);
+    if (feedback) {
+        feedback.style.display = 'block';
+    }
+    
+    // 禁用所有选项
+    container.querySelectorAll('input[type="radio"]').forEach(input => {
+        input.disabled = true;
+    });
+}
+
+// 收起题目
+function closeWeaknessQuestion(index) {
+    const container = document.getElementById(`weaknessQuestionArea_${index}`);
+    if (container) {
+        container.style.display = 'none';
+        container.innerHTML = '';
+    }
+}        
 function loadWeakness() {
     if (!currentUser) return;
     // 从 localStorage 加载薄弱知识点总库
