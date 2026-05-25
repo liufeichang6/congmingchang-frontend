@@ -982,19 +982,7 @@
                             <h2><i class="fas fa-book" style="color:#4a8fe0;margin-right:10px;"></i>错题本</h2>
                             <span style="font-size:14px;color:#64748b;margin-left:12px;" id="mistakeCount">共 0 题</span>
                         </div>
-                        <!-- ===== 错题重做（独立做题界面） ===== -->
-<div class="sub-page" id="page-redo-mistake">
-    <div class="page-header">
-        <h2><i class="fas fa-redo" style="color:#4a8fe0;margin-right:10px;"></i>错题重做</h2>
-        <span style="font-size:14px;color:#64748b;margin-left:12px;" id="redoProgress">1 / 1</span>
-    </div>
-    <div id="redoQuestionArea"></div>
-    <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;">
-        <button class="btn-primary" id="redoSubmitBtn">提交答案</button>
-        <button class="btn-outline" id="redoNextBtn" style="display:none;">下一题</button>
-        <button class="btn-outline" id="redoBackBtn">返回错题本</button>
-    </div>
-</div>
+
                         <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
                             <button class="btn-outline btn-sm" id="selectAllMistake"><i class="far fa-check-square"></i> 全选</button>
                             <button class="btn-outline btn-sm" id="deselectAllMistake"><i class="far fa-square"></i> 取消全选</button>
@@ -1021,7 +1009,19 @@
                         </div>
                         <div class="mistake-list" id="mistakeList"></div>
                     </div>
-
+                        <!-- ===== 错题重做（独立做题界面） ===== -->
+                        <div class="sub-page" id="page-redo-mistake">
+    <div class="page-header">
+        <h2><i class="fas fa-redo" style="color:#4a8fe0;margin-right:10px;"></i>错题重做</h2>
+        <span style="font-size:14px;color:#64748b;margin-left:12px;" id="redoProgress">1 / 1</span>
+    </div>
+    <div id="redoQuestionArea"></div>
+    <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;">
+        <button class="btn-primary" id="redoSubmitBtn">提交答案</button>
+        <button class="btn-outline" id="redoNextBtn" style="display:none;">下一题</button>
+        <button class="btn-outline" id="redoBackBtn">返回错题本</button>
+    </div>
+</div>
                     <!-- ===== 薄弱知识点列表 ===== -->
                     <div class="sub-page" id="page-weakness">
                         <div class="page-header">
