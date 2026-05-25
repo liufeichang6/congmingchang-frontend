@@ -1738,7 +1738,27 @@ renderQuestions(questions);
             } else {
                 statusSpan.style.color = '#dc2626';
                 statusSpan.textContent = '❌ 错误';
-                addToMistakeBook(q);
+// 判断是否处于重做模式
+if (typeof window._redoMistakeIndex !== 'undefined' && window._redoMistakeIndex !== null) {
+    // 重做模式：更新错题本中的记录
+    const redoIdx = window._redoMistakeIndex;
+    const record = mistakeData[redoIdx];
+    if (record) {
+        record.redoCount = (record.redoCount || 0) + 1;
+        if (isCorrect) {
+            record.correctCount = (record.correctCount || 0) + 1;
+        }
+        // 保存到 localStorage
+        localStorage.setItem(`mistake_book_${currentUser.id}`, JSON.stringify(mistakeData));
+        // 重新渲染错题本
+        renderMistakes();
+        // 重置重做状态
+        window._redoMistakeIndex = null;
+    }
+} else {
+    // 普通模式：添加新错题
+    addToMistakeBook(q);
+}
             }
             const existing = feedback.querySelector('.status-tag');
             if (existing) existing.remove();
