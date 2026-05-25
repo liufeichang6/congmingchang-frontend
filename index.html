@@ -1887,7 +1887,6 @@ function renderMistakes() {
         const redoCount = q.redoCount || 0;
         const correctCount = q.correctCount || 0;
         const rate = redoCount > 0 ? Math.round((correctCount / redoCount) * 100) : 0;
-        // 是否有已生成的薄弱知识点
         const hasWeakness = q.weakness && q.weakness.title;
         
         html += `
@@ -1898,8 +1897,6 @@ function renderMistakes() {
                 <div class="mistake-content">
                     <div class="q-text">${q.question}</div>
                     <div class="q-meta">
-                        <span>正确答案：${answerText}</span>
-                        <span>${q.explanation}</span>
                         <span>来源：${q.source || '未知'}</span>
                         <span>${q.date || '未知'}</span>
                         <span>分类：<span class="category-tag" onclick="editCategory(${idx})">${category}</span></span>
@@ -1911,7 +1908,25 @@ function renderMistakes() {
                         <button class="btn-success btn-sm" onclick="analyzeWeaknessWithAI(${idx})">
                             <i class="fas fa-brain"></i> AI分析薄弱点
                         </button>
+                        <button class="btn-warning btn-sm" onclick="toggleAnswer(${idx})" id="ansBtn_${idx}">
+                            <i class="fas fa-eye"></i> 显示答案
+                        </button>
                     </div>
+                    
+                    <!-- 答案显示区域（单独一列） -->
+                    <div id="answerBlock_${idx}" style="display:none; margin-top:12px; padding:12px 16px; background:#fff3cd; border-radius:8px; border-left:4px solid #f59e0b;">
+                        <div style="display:flex; gap:20px; flex-wrap:wrap;">
+                            <div style="flex:1;">
+                                <strong style="color:#1e40af;">✅ 正确答案：</strong>
+                                <span style="font-weight:600; color:#16a34a;">${answerText}</span>
+                            </div>
+                            <div style="flex:2;">
+                                <strong style="color:#1e40af;">📖 解析：</strong>
+                                <span>${q.explanation}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
                     ${hasWeakness ? `
                         <div style="margin-top:12px;padding:8px 14px;background:#f1f7fe;border-radius:8px;cursor:pointer;" onclick="toggleWeaknessSummary(${idx})">
                             <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -1934,6 +1949,19 @@ function renderMistakes() {
         `;
     });
     mistakeList.innerHTML = html;
+}
+        function toggleAnswer(index) {
+    const answerBlock = document.getElementById(`answerBlock_${index}`);
+    const btn = document.getElementById(`ansBtn_${index}`);
+    if (!answerBlock || !btn) return;
+    
+    if (answerBlock.style.display === 'none') {
+        answerBlock.style.display = 'block';
+        btn.innerHTML = '<i class="fas fa-eye-slash"></i> 隐藏答案';
+    } else {
+        answerBlock.style.display = 'none';
+        btn.innerHTML = '<i class="fas fa-eye"></i> 显示答案';
+    }
 }
         // 调用大模型分析错题，生成薄弱知识点
 async function analyzeWeaknessWithAI(index) {
