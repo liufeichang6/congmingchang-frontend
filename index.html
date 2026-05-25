@@ -1807,7 +1807,22 @@ if (typeof window._redoMistakeIndex !== 'undefined' && window._redoMistakeIndex 
                 } else {
                     statusSpan.style.color = '#dc2626';
                     statusSpan.textContent = '❌ 错误';
-                    addToMistakeBook(q);
+// 判断是否处于重做模式
+if (typeof window._redoMistakeIndex !== 'undefined' && window._redoMistakeIndex !== null) {
+    const redoIdx = window._redoMistakeIndex;
+    const record = mistakeData[redoIdx];
+    if (record) {
+        record.redoCount = (record.redoCount || 0) + 1;
+        if (isCorrect) {
+            record.correctCount = (record.correctCount || 0) + 1;
+        }
+        localStorage.setItem(`mistake_book_${currentUser.id}`, JSON.stringify(mistakeData));
+        renderMistakes();
+        window._redoMistakeIndex = null;
+    }
+} else {
+    addToMistakeBook(q);
+}
                 }
                 const existing = feedback.querySelector('.status-tag');
                 if (existing) existing.remove();
