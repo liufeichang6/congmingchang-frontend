@@ -1104,10 +1104,13 @@
 
                     <!-- ===== 管理员面板 ===== -->
                     <div class="sub-page" id="page-admin">
-                        <div class="page-header">
-                            <h2><i class="fas fa-shield-alt" style="color:#4a8fe0;margin-right:10px;"></i>管理员面板</h2>
-                            <button class="btn-primary btn-sm" id="showGenAccountBtn" style="margin-left:12px;">➕ 生成账号</button>
-                        </div>
+<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+    <button class="btn-primary btn-sm" id="showGenAccountBtn" style="margin-left:12px;">➕ 生成账号</button>
+    <button class="btn-warning btn-sm" id="showInboxBtn" style="position:relative;">
+        📬 收件箱
+        <span id="inboxBadge" style="display:none;position:absolute;top:-5px;right:-5px;background:#dc2626;color:#fff;font-size:11px;padding:2px 7px;border-radius:10px;">0</span>
+    </button>
+</div>
                         <div class="admin-panel">
                             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:12px;">
                                 <span style="font-weight:500;">用户列表</span>
@@ -1170,6 +1173,18 @@
                                 <div id="genResultDisplay" style="margin-top:12px;padding:12px;background:#f8fafc;border-radius:8px;font-size:13px;white-space:pre-wrap;display:none;"></div>
                             </div>
                         </div>
+                        <!-- 收件箱弹窗 -->
+<div id="inboxModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:10001;justify-content:center;align-items:center;">
+    <div style="background:#fff;border-radius:24px;padding:40px;max-width:600px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+            <h2 style="text-align:center;">📬 意见收件箱</h2>
+            <span onclick="document.getElementById('inboxModal').style.display='none'" style="font-size:24px;cursor:pointer;color:#64748b;">&times;</span>
+        </div>
+        <div id="inboxList" style="min-height:100px;">
+            <div style="color:#94a3b8;text-align:center;padding:40px 0;">加载中...</div>
+        </div>
+    </div>
+</div>
                     </div>
                 </div>
             </div>
@@ -2857,7 +2872,7 @@ function renderWeakness() {
                         📁 ${w.source || '未知'}  |  🏷️ ${w.category || '默认'}  |  📅 ${w.generatedAt ? new Date(w.generatedAt).toLocaleDateString() : '未知'}
                         ${w.relatedMistakes ? ` | 📚 ${w.relatedMistakes.length} 道关联错题` : ''}
                     </span>
-                    <button class="btn-primary btn-sm" onclick="generateFromWeakness(${idx})">🎯 生成题目</button>
+                    <button class="btn-primary btn-sm" onclick="generateFromWeakness(${idx})"> 生成题目</button>
                     <button class="btn-outline btn-sm" onclick="deleteWeakness(${idx})">🗑️ 删除</button>
                 </div>
             </div>
@@ -3232,52 +3247,68 @@ weaknessGenerateBtn.addEventListener('click', async function() {
             }
         });
 
-        submitFeedbackBtn.addEventListener('click', () => {
-            const content = feedbackContent.value.trim();
-            if (!content) {
-                showToastMsg('请填写意见内容', 'info');
-                return;
-            }
-            // 模拟提交意见
-            showToastMsg(' 意见已提交，感谢您的反馈！', 'success');
-            feedbackContent.value = '';
+submitFeedbackBtn.addEventListener('click', async () => {
+    const content = feedbackContent.value.trim();
+    if (!content) {
+        showToastMsg('请填写意见内容', 'info');
+        return;
+    }
+    if (!currentUser) {
+        showToastMsg('请先登录', 'error');
+        return;
+    }
+    try {
+        const response = await fetch(`${API_BASE_URL}/feedback`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify({
+                content: content,
+                userId: currentUser.id,
+                username: currentUser.username,
+                nickname: currentUser.nickname || currentUser.username
+            })
         });
-
-        // ---------- 管理员面板 ----------
-        function loadAdminUsers() {
-            if (!currentUser || currentUser.role !== 'admin') return;
-            // 模拟用户数据
-            allUsers = [
-                { id: 1, username: 'admin', nickname: '管理员', role: 'admin', status: 'online' },
-                { id: 2, username: 'liufeichang', nickname: '刘飞畅', role: 'admin', status: 'offline' },
-                { id: 3, username: 'user001', nickname: '用户1', role: 'normal', status: 'online' },
-                { id: 4, username: 'user002', nickname: '用户2', role: 'normal', status: 'banned' }
-            ];
-            renderAdminUsers();
+        if (response.ok) {
+            showToastMsg('✅ 意见已提交，感谢您的反馈！', 'success');
+            feedbackContent.value = '';
+        } else {
+            showToastMsg('提交失败，请重试', 'error');
         }
+    } catch (err) {
+        showToastMsg('提交失败：' + err.message, 'error');
+    }
+});
 
-        function renderAdminUsers() {
-            userTableBody.innerHTML = '';
-            allUsers.forEach(u => {
-                const tr = document.createElement('tr');
-                const statusClass = u.status === 'online' ? 'online' : u.status === 'banned' ? 'banned' : 'offline';
-                const statusText = u.status === 'online' ? '🟢 在线' : u.status === 'banned' ? '🔴 已封禁' : '⚪ 离线';
-                tr.innerHTML = `
-                        <td>${u.username}</td>
-                        <td>${u.nickname || '-'}</td>
-                        <td><span class="category-tag">${u.role === 'admin' ? '管理员' : '普通用户'}</span></td>
-                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-                        <td>
-                            ${u.username !== 'admin' && u.username !== 'liufeichang' ? `
-                                ${u.status !== 'banned' ? `<button class="btn-danger btn-sm" onclick="banUser(${u.id})">封禁</button>` : `<button class="btn-success btn-sm" onclick="unbanUser(${u.id})">解封</button>`}
-                                <button class="btn-danger btn-sm" onclick="deleteUser(${u.id})">删除</button>
-                            ` : `<span style="color:#94a3b8;font-size:13px;">不可操作</span>`}
-                        </td>
-                    `;
-                userTableBody.appendChild(tr);
-            });
-            userCount.textContent = allUsers.length;
-        }
+function renderAdminUsers() {
+    userTableBody.innerHTML = '';
+    if (!allUsers || allUsers.length === 0) {
+        userTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#94a3b8;">暂无用户</td></tr>`;
+        userCount.textContent = '0';
+        return;
+    }
+    allUsers.forEach(u => {
+        const tr = document.createElement('tr');
+        const statusClass = u.status === 'online' ? 'online' : u.status === 'banned' ? 'banned' : 'offline';
+        const statusText = u.status === 'online' ? '🟢 在线' : u.status === 'banned' ? '🔴 已封禁' : '⚪ 离线';
+        tr.innerHTML = `
+            <td>${u.username}</td>
+            <td>${u.nickname || '-'}</td>
+            <td><span class="category-tag">${u.role === 'admin' ? '管理员' : '普通用户'}</span></td>
+            <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+            <td>
+                ${u.username !== 'admin' && u.username !== 'liufeichang' ? `
+                    ${u.status !== 'banned' ? `<button class="btn-danger btn-sm" onclick="banUser(${u.id})">封禁</button>` : `<button class="btn-success btn-sm" onclick="unbanUser(${u.id})">解封</button>`}
+                    <button class="btn-danger btn-sm" onclick="deleteUser(${u.id})">删除</button>
+                ` : `<span style="color:#94a3b8;font-size:13px;">不可操作</span>`}
+            </td>
+        `;
+        userTableBody.appendChild(tr);
+    });
+    userCount.textContent = allUsers.length;
+}
 
         function banUser(id) {
             if (!confirm('确定要封禁该用户吗？')) return;
@@ -3322,46 +3353,66 @@ weaknessGenerateBtn.addEventListener('click', async function() {
             });
         });
 
-        confirmGenBtn.addEventListener('click', () => {
-            const mode = document.querySelector('input[name="genMode"]:checked').value;
-            let results = [];
-            if (mode === 'batch') {
-                const prefix = genPrefix.value.trim() || 'user';
-                const count = parseInt(genCount.value) || 3;
-                for (let i = 0; i < count; i++) {
-                    const username = `${prefix}${Math.floor(Math.random() * 10000)}`;
-                    const password = Math.random().toString(36).slice(-8);
-                    results.push({ username, password });
-                }
-            } else {
-                const username = singleUsername.value.trim();
-                const password = singlePassword.value.trim();
-                if (!username || !password || password.length < 6) {
-                    showToastMsg('请填写有效的用户名和密码（至少6位）', 'error');
-                    return;
-                }
-                results.push({ username, password });
-            }
+confirmGenBtn.addEventListener('click', async () => {
+    const mode = document.querySelector('input[name="genMode"]:checked').value;
+    let results = [];
+    let usernames = [];
+    let passwords = [];
+    
+    if (mode === 'batch') {
+        const prefix = genPrefix.value.trim() || 'user';
+        const count = parseInt(genCount.value) || 3;
+        for (let i = 0; i < count; i++) {
+            const username = `${prefix}${Math.floor(Math.random() * 10000)}`;
+            const password = Math.random().toString(36).slice(-8);
+            usernames.push(username);
+            passwords.push(password);
+        }
+    } else {
+        const username = singleUsername.value.trim();
+        const password = singlePassword.value.trim();
+        if (!username || !password || password.length < 6) {
+            showToastMsg('请填写有效的用户名和密码（至少6位）', 'error');
+            return;
+        }
+        usernames.push(username);
+        passwords.push(password);
+    }
+    
+    // ✅ 调用后端 API 批量生成真实账号
+    try {
+        const response = await fetch(`${API_BASE_URL}/admin/generate-users`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify({ 
+                count: usernames.length, 
+                prefix: genPrefix.value.trim() || 'user' 
+            })
+        });
+        const data = await response.json();
+        if (data.users) {
+            results = data.users;
             genResultDisplay.style.display = 'block';
             genResultDisplay.innerHTML = results.map(r =>
-                    `用户名: <strong>${r.username}</strong>  密码: <strong>${r.password}</strong>`
-                ).join('\n');
-            // 模拟存入后端
-            results.forEach(r => {
-                allUsers.push({
-                    id: Date.now() + Math.random() * 1000,
-                    username: r.username,
-                    nickname: r.username,
-                    role: 'normal',
-                    status: 'offline'
-                });
-            });
-            renderAdminUsers();
-            showToastMsg(` 已生成 ${results.length} 个账号`, 'success');
+                `用户名: <strong>${r.username}</strong>  密码: <strong>${r.password}</strong>`
+            ).join('\n');
+            
+            // 刷新用户列表
+            await loadAdminUsers();
+            showToastMsg(`✅ 已生成 ${results.length} 个真实账号`, 'success');
             // 清空输入
             singleUsername.value = '';
             singlePassword.value = '';
-        });
+        } else {
+            showToastMsg('生成账号失败：' + data.error, 'error');
+        }
+    } catch (err) {
+        showToastMsg('生成账号失败：' + err.message, 'error');
+    }
+});
 
         // ---------- 登录/注册 API ----------
         async function login(username, password) {
@@ -3444,33 +3495,39 @@ weaknessGenerateBtn.addEventListener('click', async function() {
             adminGenForm.style.display = 'none';
         });
 
-        // 登录按钮
-        document.getElementById('loginBtn').addEventListener('click', async () => {
-            const username = document.getElementById('loginUsername').value.trim();
-            const password = document.getElementById('loginPassword').value.trim();
-            if (!username || !password) {
-                alert('请填写用户名和密码');
-                return;
-            }
-            try {
-                const user = await login(username, password);
-                loginOverlay.style.display = 'none';
-                alert(`欢迎回来，${user.nickname || user.username}！`);
-                // 加载数据
-                loadMistakes();
-                loadLibrary();
-                loadWeakness();
-                loadMnemonics();
-                loadAccountInfo();
-                if (user.role === 'admin' || user.username === 'liufeichang') {
-                    adminMenuItem.style.display = 'block';
-                    loadAdminUsers();
-                }
-            } catch (err) {
-                alert('登录失败：' + err.message);
-            }
-        });
-
+// 登录按钮
+document.getElementById('loginBtn').addEventListener('click', async () => {
+    const username = document.getElementById('loginUsername').value.trim();
+    const password = document.getElementById('loginPassword').value.trim();
+    if (!username || !password) {
+        showToastMsg('请填写用户名和密码', 'error');
+        return;
+    }
+    try {
+        const user = await login(username, password);
+        // ✅ 登录成功后自动关闭登录窗口
+        document.getElementById('loginOverlay').style.display = 'none';
+        
+        // ✅ 记住密码（保存到 localStorage）
+        localStorage.setItem('remembered_username', username);
+        localStorage.setItem('remembered_password', password);
+        
+        showToastMsg(`欢迎回来，${user.nickname || user.username}！`, 'success');
+        // 加载数据
+        loadMistakes();
+        loadLibrary();
+        loadWeakness();
+        loadMnemonics();
+        loadAccountInfo();
+        if (user.role === 'admin' || user.username === 'liufeichang') {
+            adminMenuItem.style.display = 'block';
+            loadAdminUsers();
+            loadInbox(); // 加载收件箱
+        }
+    } catch (err) {
+        showToastMsg('登录失败：' + err.message, 'error');
+    }
+});
         // 注册按钮（提示不支持注册）
         document.getElementById('registerBtn').addEventListener('click', () => {
             alert('目前仅支持已有用户登录，不支持注册');
@@ -3556,6 +3613,13 @@ document.getElementById('randomGenerateBtn').addEventListener('click', generateR
 document.getElementById('paperGenerateBtn').addEventListener('click', generatePaper);
         // ---------- 初始化 ----------
         (async function() {
+                const rememberedUsername = localStorage.getItem('remembered_username');
+    const rememberedPassword = localStorage.getItem('remembered_password');
+    if (rememberedUsername && rememberedPassword) {
+        document.getElementById('loginUsername').value = rememberedUsername;
+        document.getElementById('loginPassword').value = rememberedPassword;
+    }
+    
             const user = await verifyToken();
             if (user) {
                 currentUser = user;
@@ -3599,7 +3663,130 @@ document.getElementById('paperGenerateBtn').addEventListener('click', generatePa
         window.banUser = banUser;
         window.unbanUser = unbanUser;
         window.deleteUser = deleteUser;
+// ========== 收件箱功能 ==========
+// 加载收件箱
+async function loadInbox() {
+    if (!currentUser || currentUser.role !== 'admin') return;
+    try {
+        const response = await fetch(`${API_BASE_URL}/admin/feedback`, {
+            headers: {
+                'Authorization': `Bearer ${authToken}`
+            }
+        });
+        if (response.ok) {
+            const data = await response.json();
+            const feedbacks = data.feedbacks || [];
+            // 更新红点（未读数量）
+            const unread = feedbacks.filter(f => !f.read).length;
+            const badge = document.getElementById('inboxBadge');
+            if (badge) {
+                if (unread > 0) {
+                    badge.style.display = 'inline';
+                    badge.textContent = unread;
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+            return feedbacks;
+        }
+    } catch (err) {
+        console.error('加载收件箱失败:', err);
+    }
+    return [];
+}
 
+// 显示收件箱
+async function showInbox() {
+    document.getElementById('inboxModal').style.display = 'flex';
+    const inboxList = document.getElementById('inboxList');
+    inboxList.innerHTML = '<div style="color:#94a3b8;text-align:center;padding:40px 0;">加载中...</div>';
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/admin/feedback`, {
+            headers: {
+                'Authorization': `Bearer ${authToken}`
+            }
+        });
+        if (response.ok) {
+            const data = await response.json();
+            const feedbacks = data.feedbacks || [];
+            if (feedbacks.length === 0) {
+                inboxList.innerHTML = '<div style="color:#94a3b8;text-align:center;padding:40px 0;">暂无意见反馈</div>';
+                return;
+            }
+            let html = '';
+            feedbacks.forEach((f, idx) => {
+                html += `
+                    <div style="background:#f8fafc;border-radius:10px;padding:16px;margin-bottom:12px;border:1px solid #e9edf2;${!f.read ? 'border-left:4px solid #dc2626;' : ''}">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                            <span style="font-weight:500;">${f.nickname || f.username}</span>
+                            <span style="font-size:12px;color:#94a3b8;">${f.createdAt ? new Date(f.createdAt).toLocaleString() : '未知'}</span>
+                        </div>
+                        <div style="font-size:14px;color:#1e293b;">${f.content}</div>
+                        <div style="margin-top:8px;display:flex;gap:10px;">
+                            ${!f.read ? `<button class="btn-primary btn-sm" onclick="markFeedbackRead('${f.id}')">标记为已读</button>` : `<span style="font-size:12px;color:#16a34a;">✅ 已读</span>`}
+                            <button class="btn-danger btn-sm" onclick="deleteFeedback('${f.id}')">🗑️ 删除</button>
+                        </div>
+                    </div>
+                `;
+            });
+            inboxList.innerHTML = html;
+            // 更新红点
+            await loadInbox();
+        } else {
+            inboxList.innerHTML = '<div style="color:#dc2626;text-align:center;padding:40px 0;">加载失败，请重试</div>';
+        }
+    } catch (err) {
+        console.error('显示收件箱失败:', err);
+        inboxList.innerHTML = '<div style="color:#dc2626;text-align:center;padding:40px 0;">加载失败：' + err.message + '</div>';
+    }
+}
+
+// 标记为已读
+async function markFeedbackRead(feedbackId) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/admin/feedback/${feedbackId}/read`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${authToken}`
+            }
+        });
+        if (response.ok) {
+            showToastMsg('✅ 已标记为已读', 'success');
+            showInbox();
+            await loadInbox();
+        } else {
+            showToastMsg('操作失败', 'error');
+        }
+    } catch (err) {
+        showToastMsg('操作失败：' + err.message, 'error');
+    }
+}
+
+// 删除反馈
+async function deleteFeedback(feedbackId) {
+    if (!confirm('确定要删除这条反馈吗？')) return;
+    try {
+        const response = await fetch(`${API_BASE_URL}/admin/feedback/${feedbackId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${authToken}`
+            }
+        });
+        if (response.ok) {
+            showToastMsg('✅ 已删除', 'success');
+            showInbox();
+            await loadInbox();
+        } else {
+            showToastMsg('删除失败', 'error');
+        }
+    } catch (err) {
+        showToastMsg('删除失败：' + err.message, 'error');
+    }
+}
+
+// 绑定收件箱按钮
+document.getElementById('showInboxBtn').addEventListener('click', showInbox);
         console.log(' 所有功能已就绪');
     </script>
 
