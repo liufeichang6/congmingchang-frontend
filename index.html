@@ -1935,6 +1935,119 @@ function renderMistakes() {
     });
     mistakeList.innerHTML = html;
 }
+        // 调用大模型分析错题，生成薄弱知识点
+async function analyzeWeaknessWithAI(index) {
+    const q = mistakeData[index];
+    if (!q) return;
+    
+    // 防止重复点击
+    const btn = event.target;
+    if (btn.disabled) return;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> 分析中...';
+    
+    try {
+        const prompt = `
+            你是一个教育专家。请分析以下错题，提取出该题目所考察的核心知识点，并给出一个简洁的薄弱知识点总结。
+            
+            输出格式必须为 JSON 对象，包含：
+            - "title": 知识点标题（10字以内，如"细胞膜转运"）
+            - "description": 知识点详细描述（50字以内，解释为什么这是薄弱点）
+            - "keyPoints": 核心要点（30字以内，列出最关键的记忆点）
+            
+            错题内容：
+            题目：${q.question}
+            正确答案：${Array.isArray(q.answer) ? q.answer.join('、') : q.answer}
+            解析：${q.explanation}
+            
+            只输出 JSON，不要包含任何额外解释。
+        `;
+        
+        const response = await fetch(LLM_API_BASE, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${LLM_API_KEY}`
+            },
+            body: JSON.stringify({
+                model: LLM_MODEL_ID,
+                messages: [
+                    { role: 'system', content: '你是一个专业的教育分析助手，只输出 JSON 格式。' },
+                    { role: 'user', content: prompt }
+                ],
+                temperature: 0.7,
+                max_tokens: 1000
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API 请求失败 (${response.status})`);
+        }
+        
+        const data = await response.json();
+        let content = data.choices?.[0]?.message?.content;
+        if (!content) throw new Error('AI 返回内容为空');
+        
+        // 清理可能存在的 Markdown 标记
+        let jsonStr = content.trim();
+        if (jsonStr.startsWith('```json')) jsonStr = jsonStr.slice(7);
+        else if (jsonStr.startsWith('```')) jsonStr = jsonStr.slice(3);
+        if (jsonStr.endsWith('```')) jsonStr = jsonStr.slice(0, -3);
+        jsonStr = jsonStr.trim();
+        
+        const weakness = JSON.parse(jsonStr);
+        if (!weakness.title || !weakness.description) {
+            throw new Error('AI 返回格式不正确');
+        }
+        
+        // 保存到错题数据中
+        q.weakness = weakness;
+        q.weakness.generatedAt = new Date().toISOString();
+        
+        // 保存到 localStorage
+        localStorage.setItem(`mistake_book_${currentUser.id}`, JSON.stringify(mistakeData));
+        
+        // 同时添加到薄弱知识点总库
+        await addToWeaknessLibrary(weakness, q);
+        
+        // 重新渲染错题本
+        renderMistakes();
+        showToastMsg(`✅ 已生成薄弱知识点：${weakness.title}`, 'success');
+        
+    } catch (err) {
+        console.error('AI分析失败:', err);
+        showToastMsg(`❌ 分析失败：${err.message}`, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-brain"></i> AI分析薄弱点';
+    }
+}
+
+// 将知识点添加到薄弱知识点总库
+async function addToWeaknessLibrary(weakness, mistake) {
+    let library = JSON.parse(localStorage.getItem(`weakness_library_${currentUser.id}`) || '[]');
+    // 检查是否已存在相同标题
+    const exists = library.some(item => item.title === weakness.title);
+    if (!exists) {
+        library.push({
+            title: weakness.title,
+            description: weakness.description,
+            keyPoints: weakness.keyPoints,
+            source: mistake.source || '未知',
+            category: mistake.category || '默认',
+            relatedMistakes: [mistake.question],
+            generatedAt: new Date().toISOString()
+        });
+        localStorage.setItem(`weakness_library_${currentUser.id}`, JSON.stringify(library));
+    } else {
+        // 如果已存在，添加关联错题
+        const item = library.find(item => item.title === weakness.title);
+        if (item && !item.relatedMistakes.includes(mistake.question)) {
+            item.relatedMistakes.push(mistake.question);
+            localStorage.setItem(`weakness_library_${currentUser.id}`, JSON.stringify(library));
+        }
+    }
+}
         function deleteMistake(index) {
             if (!confirm('确定要删除这条错题吗？')) return;
             mistakeData.splice(index, 1);
@@ -2139,93 +2252,207 @@ function toggleWeaknessSummary(index) {
     }
 }
 
-function generateFromWeaknessDetail(topic) {
-    // 基于知识点生成题目（简易版）
-    const qs = [
-        {
-            question: `关于"${topic}"的核心概念，以下描述正确的是？`,
-            options: ['A. 核心概念A', 'B. 核心概念B', 'C. 核心概念C', 'D. 核心概念D'],
-            answer: 'A',
-            explanation: `这是基于知识点 "${topic}" 生成的题目。`
-        },
-        {
-            question: `"${topic}"在应用中需要注意什么？`,
-            options: ['A. 注意A', 'B. 注意B', 'C. 注意C', 'D. 注意D'],
-            answer: 'B',
-            explanation: `这是基于知识点 "${topic}" 生成的题目。`
-        },
-        {
-            question: `以下哪项最准确地反映了"${topic}"的核心？`,
-            options: ['A. 反映A', 'B. 反映B', 'C. 反映C', 'D. 反映D'],
-            answer: 'C',
-            explanation: `这是基于知识点 "${topic}" 生成的题目。`
+async function generateFromWeaknessDetail(topic) {
+    // 找到对应的薄弱知识点
+    let weakness = null;
+    for (const w of weaknessData) {
+        if (w.title === topic) {
+            weakness = w;
+            break;
         }
-    ];
-    renderQuestions(qs);
-    switchPage('generate');
-    showToastMsg(`🎯 已基于 "${topic}" 生成 3 道题目`, 'success');
+    }
+    if (!weakness) {
+        showToastMsg('⚠️ 未找到该知识点', 'error');
+        return;
+    }
+    
+    // 调用大模型生成题目
+    const btn = event.target;
+    if (btn.disabled) return;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> 生成中...';
+    
+    try {
+        const prompt = `
+            你是一个教育专家。请根据以下薄弱知识点，生成 3 道相关题目（含选择题），帮助巩固该知识点。
+            
+            薄弱知识点：
+            标题：${weakness.title}
+            描述：${weakness.description}
+            核心要点：${weakness.keyPoints}
+            
+            要求：
+            1. 每道题为单选题，有4个选项（A、B、C、D）
+            2. 输出格式为 JSON 数组，每个对象包含："question", "options", "answer", "explanation"
+            3. 只输出 JSON，不要包含任何额外解释
+        `;
+        
+        const response = await fetch(LLM_API_BASE, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${LLM_API_KEY}`
+            },
+            body: JSON.stringify({
+                model: LLM_MODEL_ID,
+                messages: [
+                    { role: 'system', content: '你是一个专业的教育出题助手，只输出 JSON 格式。' },
+                    { role: 'user', content: prompt }
+                ],
+                temperature: 0.7,
+                max_tokens: 3000
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API 请求失败 (${response.status})`);
+        }
+        
+        const data = await response.json();
+        let content = data.choices?.[0]?.message?.content;
+        if (!content) throw new Error('AI 返回内容为空');
+        
+        // 清理 Markdown
+        let jsonStr = content.trim();
+        if (jsonStr.startsWith('```json')) jsonStr = jsonStr.slice(7);
+        else if (jsonStr.startsWith('```')) jsonStr = jsonStr.slice(3);
+        if (jsonStr.endsWith('```')) jsonStr = jsonStr.slice(0, -3);
+        jsonStr = jsonStr.trim();
+        
+        const questions = JSON.parse(jsonStr);
+        if (!Array.isArray(questions) || questions.length === 0) {
+            throw new Error('AI 返回的题目为空');
+        }
+        
+        renderQuestions(questions);
+        switchPage('generate');
+        showToastMsg(`🎯 已根据 "${weakness.title}" 生成 ${questions.length} 道题目`, 'success');
+        
+    } catch (err) {
+        console.error('出题失败:', err);
+        showToastMsg(`❌ 出题失败：${err.message}`, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '🎯 基于此知识点出题';
+    }
 }
-        function loadWeakness() {
-            if (!currentUser) return;
-            // 根据错题和上传文档自动生成
-            const mistakes = JSON.parse(localStorage.getItem(`mistake_book_${currentUser.id}`) || '[]');
-            const topics = [];
-            mistakes.forEach(q => {
-                const topic = q.question.replace(/^【.*?】/, '').slice(0, 20);
-                if (!topics.some(t => t.title === topic)) {
-                    topics.push({
-                        title: topic,
-                        description: `基于错题：${q.question.slice(0, 60)}...`,
-                        source: q.source || '未知',
-                        category: q.category || '默认'
-                    });
-                }
-            });
-            weaknessData = topics.length > 0 ? topics : [{ title: '暂无薄弱知识点', description: '请先完成练习并产生错题', source: '系统', category: '默认' }];
-            renderWeakness();
+function loadWeakness() {
+    if (!currentUser) return;
+    // 从 localStorage 加载薄弱知识点总库
+    weaknessData = JSON.parse(localStorage.getItem(`weakness_library_${currentUser.id}`) || '[]');
+    renderWeakness();
+}
+function renderWeakness() {
+    if (!weaknessData || weaknessData.length === 0) {
+        weaknessList.innerHTML = `
+            <div style="color:#94a3b8;text-align:center;padding:40px 0;">
+                <i class="fas fa-brain" style="font-size:32px;display:block;margin-bottom:12px;"></i>
+                暂无薄弱知识点<br>
+                <span style="font-size:13px;">请先在错题本中点击「AI分析薄弱点」生成</span>
+            </div>
+        `;
+        return;
+    }
+    let html = '';
+    weaknessData.forEach((w, idx) => {
+        html += `
+            <div class="weakness-item">
+                <div class="weak-title">📌 ${w.title}</div>
+                <div class="weak-desc">${w.description}</div>
+                <div style="margin-top:6px;font-size:13px;color:#64748b;">
+                    <strong>核心要点：</strong>${w.keyPoints || '无'}
+                </div>
+                <div class="weak-actions">
+                    <span style="font-size:12px;color:#94a3b8;">
+                        📁 ${w.source || '未知'}  |  🏷️ ${w.category || '默认'}  |  📅 ${w.generatedAt ? new Date(w.generatedAt).toLocaleDateString() : '未知'}
+                        ${w.relatedMistakes ? ` | 📚 ${w.relatedMistakes.length} 道关联错题` : ''}
+                    </span>
+                    <button class="btn-primary btn-sm" onclick="generateFromWeakness(${idx})">🎯 生成题目</button>
+                    <button class="btn-outline btn-sm" onclick="deleteWeakness(${idx})">🗑️ 删除</button>
+                </div>
+            </div>
+        `;
+    });
+    weaknessList.innerHTML = html;
+}
+async function generateFromWeakness(index) {
+    const w = weaknessData[index];
+    if (!w) return;
+    
+    // 防止重复点击
+    const btn = event.target;
+    if (btn.disabled) return;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> 生成中...';
+    
+    try {
+        const prompt = `
+            你是一个教育专家。请根据以下薄弱知识点，生成 3 道相关题目（含选择题），帮助巩固该知识点。
+            
+            薄弱知识点：
+            标题：${w.title}
+            描述：${w.description}
+            核心要点：${w.keyPoints}
+            
+            要求：
+            1. 每道题为单选题，有4个选项（A、B、C、D）
+            2. 输出格式为 JSON 数组，每个对象包含："question", "options", "answer", "explanation"
+            3. 只输出 JSON，不要包含任何额外解释
+            
+            文档内容如下：
+            ${w.title} - ${w.description}
+        `;
+        
+        const response = await fetch(LLM_API_BASE, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${LLM_API_KEY}`
+            },
+            body: JSON.stringify({
+                model: LLM_MODEL_ID,
+                messages: [
+                    { role: 'system', content: '你是一个专业的教育出题助手，只输出 JSON 格式。' },
+                    { role: 'user', content: prompt }
+                ],
+                temperature: 0.7,
+                max_tokens: 3000
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API 请求失败 (${response.status})`);
         }
-
-        function renderWeakness() {
-            if (!weaknessData || weaknessData.length === 0) {
-                weaknessList.innerHTML = `<div style="color:#94a3b8;text-align:center;padding:40px 0;">暂无薄弱知识点</div>`;
-                return;
-            }
-            let html = '';
-            weaknessData.forEach((w, idx) => {
-                html += `
-                        <div class="weakness-item">
-                            <div class="weak-title">${w.title}</div>
-                            <div class="weak-desc">${w.description}</div>
-                            <div class="weak-actions">
-                                <span style="font-size:12px;color:#94a3b8;">📁 ${w.source}  |  🏷️ ${w.category}</span>
-                                <button class="btn-primary btn-sm" onclick="generateFromWeakness(${idx})">🎯 生成题目</button>
-                                <button class="btn-outline btn-sm" onclick="deleteWeakness(${idx})">🗑️ 删除</button>
-                            </div>
-                        </div>
-                    `;
-            });
-            weaknessList.innerHTML = html;
+        
+        const data = await response.json();
+        let content = data.choices?.[0]?.message?.content;
+        if (!content) throw new Error('AI 返回内容为空');
+        
+        // 清理 Markdown
+        let jsonStr = content.trim();
+        if (jsonStr.startsWith('```json')) jsonStr = jsonStr.slice(7);
+        else if (jsonStr.startsWith('```')) jsonStr = jsonStr.slice(3);
+        if (jsonStr.endsWith('```')) jsonStr = jsonStr.slice(0, -3);
+        jsonStr = jsonStr.trim();
+        
+        const questions = JSON.parse(jsonStr);
+        if (!Array.isArray(questions) || questions.length === 0) {
+            throw new Error('AI 返回的题目为空');
         }
-
-        function generateFromWeakness(index) {
-            const w = weaknessData[index];
-            if (!w || w.title === '暂无薄弱知识点') {
-                showToastMsg('无法生成题目', 'info');
-                return;
-            }
-            // 模拟生成 3 道题
-            const qs = [
-                { question: `关于"${w.title}"的核心概念，以下描述正确的是？`, options: ['A. 描述A', 'B. 描述B', 'C. 描述C', 'D. 描述D'], answer: 'A',
-                    explanation: '这是基于薄弱知识点的生成题目。' },
-                { question: `"${w.title}"在应用中需要注意什么？`, options: ['A. 注意A', 'B. 注意B', 'C. 注意C', 'D. 注意D'], answer: 'B',
-                    explanation: '这是基于薄弱知识点的生成题目。' },
-                { question: `以下哪项最准确地反映了"${w.title}"的核心？`, options: ['A. 反映A', 'B. 反映B', 'C. 反映C', 'D. 反映D'],
-                    answer: 'C', explanation: '这是基于薄弱知识点的生成题目。' }
-            ];
-            renderQuestions(qs);
-            switchPage('generate');
-            showToastMsg(` 已根据 "${w.title}" 生成 3 道题目`, 'success');
-        }
+        
+        // 渲染题目
+        renderQuestions(questions);
+        switchPage('generate');
+        showToastMsg(`🎯 已根据 "${w.title}" 生成 ${questions.length} 道题目`, 'success');
+        
+    } catch (err) {
+        console.error('出题失败:', err);
+        showToastMsg(`❌ 出题失败：${err.message}`, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '🎯 生成题目';
+    }
+}
 
         function deleteWeakness(index) {
             if (!confirm('确定要删除这个薄弱知识点吗？')) return;
@@ -2234,26 +2461,82 @@ function generateFromWeaknessDetail(topic) {
             showToastMsg('已删除', 'info');
         }
 
-        weaknessGenerateBtn.addEventListener('click', () => {
-            if (weaknessData.length === 0 || weaknessData[0].title === '暂无薄弱知识点') {
-                showToastMsg('暂无薄弱知识点可出题', 'info');
-                return;
-            }
-            const qs = [];
-            const topics = weaknessData.filter(w => w.title !== '暂无薄弱知识点');
-            for (let i = 0; i < Math.min(5, topics.length); i++) {
-                const w = topics[i % topics.length];
-                qs.push({
-                    question: `关于"${w.title}"的知识点，以下说法正确的是？`,
-                    options: ['A. 基础原理', 'B. 实际应用', 'C. 相关拓展', 'D. 常见误区'],
-                    answer: 'A',
-                    explanation: `基于薄弱知识点 "${w.title}" 生成。`
-                });
-            }
-            renderQuestions(qs);
-            switchPage('generate');
-            showToastMsg(' 已根据薄弱知识点生成 5 道题目', 'success');
+weaknessGenerateBtn.addEventListener('click', async function() {
+    if (weaknessData.length === 0) {
+        showToastMsg('⚠️ 暂无薄弱知识点，请先在错题本中生成', 'info');
+        return;
+    }
+    
+    // 从所有薄弱知识点中随机选择 3 个
+    const shuffled = [...weaknessData].sort(() => Math.random() - 0.5);
+    const selected = shuffled.slice(0, Math.min(3, shuffled.length));
+    
+    this.disabled = true;
+    this.innerHTML = '<span class="spinner"></span> 生成中...';
+    
+    try {
+        // 为每个知识点生成题目（简化：只生成一组题目）
+        const topics = selected.map(w => `${w.title}：${w.description}`).join('\n');
+        const prompt = `
+            你是一个教育专家。请根据以下薄弱知识点，生成 5 道综合练习题（含选择题），帮助巩固这些知识点。
+            
+            知识点列表：
+            ${topics}
+            
+            要求：
+            1. 每道题为单选题，有4个选项（A、B、C、D）
+            2. 输出格式为 JSON 数组，每个对象包含："question", "options", "answer", "explanation"
+            3. 只输出 JSON，不要包含任何额外解释
+        `;
+        
+        const response = await fetch(LLM_API_BASE, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${LLM_API_KEY}`
+            },
+            body: JSON.stringify({
+                model: LLM_MODEL_ID,
+                messages: [
+                    { role: 'system', content: '你是一个专业的教育出题助手，只输出 JSON 格式。' },
+                    { role: 'user', content: prompt }
+                ],
+                temperature: 0.7,
+                max_tokens: 4000
+            })
         });
+        
+        if (!response.ok) {
+            throw new Error(`API 请求失败 (${response.status})`);
+        }
+        
+        const data = await response.json();
+        let content = data.choices?.[0]?.message?.content;
+        if (!content) throw new Error('AI 返回内容为空');
+        
+        let jsonStr = content.trim();
+        if (jsonStr.startsWith('```json')) jsonStr = jsonStr.slice(7);
+        else if (jsonStr.startsWith('```')) jsonStr = jsonStr.slice(3);
+        if (jsonStr.endsWith('```')) jsonStr = jsonStr.slice(0, -3);
+        jsonStr = jsonStr.trim();
+        
+        const questions = JSON.parse(jsonStr);
+        if (!Array.isArray(questions) || questions.length === 0) {
+            throw new Error('AI 返回的题目为空');
+        }
+        
+        renderQuestions(questions);
+        switchPage('generate');
+        showToastMsg(`🎯 已根据薄弱知识点生成 ${questions.length} 道题目`, 'success');
+        
+    } catch (err) {
+        console.error('出题失败:', err);
+        showToastMsg(`❌ 出题失败：${err.message}`, 'error');
+    } finally {
+        this.disabled = false;
+        this.innerHTML = '🎯 按薄弱点出题';
+    }
+});
 
         // ---------- 口诀题目 ----------
         function loadMnemonics() {
