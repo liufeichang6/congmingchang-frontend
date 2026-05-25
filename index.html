@@ -982,6 +982,19 @@
                             <h2><i class="fas fa-book" style="color:#4a8fe0;margin-right:10px;"></i>错题本</h2>
                             <span style="font-size:14px;color:#64748b;margin-left:12px;" id="mistakeCount">共 0 题</span>
                         </div>
+                        <!-- ===== 错题重做（独立做题界面） ===== -->
+<div class="sub-page" id="page-redo-mistake">
+    <div class="page-header">
+        <h2><i class="fas fa-redo" style="color:#4a8fe0;margin-right:10px;"></i>错题重做</h2>
+        <span style="font-size:14px;color:#64748b;margin-left:12px;" id="redoProgress">1 / 1</span>
+    </div>
+    <div id="redoQuestionArea"></div>
+    <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;">
+        <button class="btn-primary" id="redoSubmitBtn">提交答案</button>
+        <button class="btn-outline" id="redoNextBtn" style="display:none;">下一题</button>
+        <button class="btn-outline" id="redoBackBtn">返回错题本</button>
+    </div>
+</div>
                         <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
                             <button class="btn-outline btn-sm" id="selectAllMistake"><i class="far fa-check-square"></i> 全选</button>
                             <button class="btn-outline btn-sm" id="deselectAllMistake"><i class="far fa-square"></i> 取消全选</button>
@@ -1860,45 +1873,56 @@ if (typeof window._redoMistakeIndex !== 'undefined' && window._redoMistakeIndex 
             renderMistakes();
         }
 
-        function renderMistakes() {
-            if (!mistakeData || mistakeData.length === 0) {
-                mistakeList.innerHTML = `<div style="color:#94a3b8;text-align:center;padding:40px 0;">暂无错题，加油！</div>`;
-                mistakeCount.textContent = '共 0 题';
-                return;
-            }
-            mistakeCount.textContent = `共 ${mistakeData.length} 题`;
-            let html = '';
-            mistakeData.forEach((q, idx) => {
-                const answerText = Array.isArray(q.answer) ? q.answer.join('、') : q.answer;
-                const category = q.category || '默认';
-                const redoCount = q.redoCount || 0;
-                const correctCount = q.correctCount || 0;
-                const rate = redoCount > 0 ? Math.round((correctCount / redoCount) * 100) : 0;
-                html += `
-                        <div class="mistake-item" data-index="${idx}">
-                            <div class="checkbox-col">
-                                <input type="checkbox" class="mistake-check" data-index="${idx}" />
-                            </div>
-                            <div class="mistake-content">
-                                <div class="q-text">${q.question}</div>
-                                <div class="q-meta">
-                                    <span> 正确答案：${answerText}</span>
-                                    <span> ${q.explanation}</span>
-                                    <span> 来源：${q.source || '未知'}</span>
-                                    <span> ${q.date || '未知'}</span>
-                                    <span> 分类：<span class="category-tag" onclick="editCategory(${idx})">${category}</span></span>
-                                    <span> 重做 ${redoCount} 次，正确率 ${rate}%</span>
-                                </div>
-                            </div>
-                            <div class="mistake-actions">
-                                <button class="btn-outline btn-sm" onclick="deleteMistake(${idx})">🗑️ 删除</button>
-                                <button class="btn-primary btn-sm" onclick="redoMistake(${idx})"> 重做</button>
-                            </div>
+function renderMistakes() {
+    if (!mistakeData || mistakeData.length === 0) {
+        mistakeList.innerHTML = `<div style="color:#94a3b8;text-align:center;padding:40px 0;">暂无错题，加油！</div>`;
+        mistakeCount.textContent = '共 0 题';
+        return;
+    }
+    mistakeCount.textContent = `共 ${mistakeData.length} 题`;
+    let html = '';
+    mistakeData.forEach((q, idx) => {
+        const answerText = Array.isArray(q.answer) ? q.answer.join('、') : q.answer;
+        const category = q.category || '默认';
+        const redoCount = q.redoCount || 0;
+        const correctCount = q.correctCount || 0;
+        const rate = redoCount > 0 ? Math.round((correctCount / redoCount) * 100) : 0;
+        html += `
+            <div class="mistake-item" data-index="${idx}">
+                <div class="checkbox-col">
+                    <input type="checkbox" class="mistake-check" data-index="${idx}" />
+                </div>
+                <div class="mistake-content">
+                    <div class="q-text">${q.question}</div>
+                    <div class="q-meta">
+                        <span>正确答案：${answerText}</span>
+                        <span>${q.explanation}</span>
+                        <span>来源：${q.source || '未知'}</span>
+                        <span>${q.date || '未知'}</span>
+                        <span>分类：<span class="category-tag" onclick="editCategory(${idx})">${category}</span></span>
+                        <span>重做 ${redoCount} 次，正确率 ${rate}%</span>
+                    </div>
+                    <div class="mistake-actions">
+                        <button class="btn-outline btn-sm" onclick="deleteMistake(${idx})">🗑️ 删除</button>
+                        <button class="btn-primary btn-sm" onclick="redoMistake(${idx})">🔄 重做</button>
+                    </div>
+                    <!-- 👇 薄弱知识点总结（放这里） 👇 -->
+                    <div style="margin-top:12px;padding:8px 14px;background:#f1f7fe;border-radius:8px;cursor:pointer;" onclick="toggleWeaknessSummary(${idx})">
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <span style="font-size:14px;font-weight:500;">💡 薄弱知识点：${generateWeaknessSummary(q)}</span>
+                            <i class="fas fa-chevron-down" id="weaknessArrow_${idx}"></i>
                         </div>
-                    `;
-            });
-            mistakeList.innerHTML = html;
-        }
+                        <div id="weaknessDetail_${idx}" style="display:none;margin-top:8px;padding:8px 12px;background:#fff;border-radius:6px;font-size:14px;color:#475569;">
+                            ${generateWeaknessDetail(q)}
+                        </div>
+                    </div>
+                    <!-- 👆 到这里结束 👆 -->
+                </div>
+            </div>
+        `;
+    });
+    mistakeList.innerHTML = html;
+}
 
         function deleteMistake(index) {
             if (!confirm('确定要删除这条错题吗？')) return;
