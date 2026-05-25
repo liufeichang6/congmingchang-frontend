@@ -1652,7 +1652,6 @@ renderQuestions(questions);
 }
         generateBtn.addEventListener('click', generateQuestions);
 
-        // ---------- 渲染题目 ----------
 // ---------- 渲染题目 ----------
 function renderQuestions(questions) {
     if (!questions || questions.length === 0) {
@@ -1670,44 +1669,68 @@ function renderQuestions(questions) {
         const inputType = isMulti ? 'checkbox' : 'radio';
         const name = `q_${idx}`;
 
-        // ===== 🛡️ 核心修复：确保 options 是数组 =====
+        // ===== 🛡️ 核心修复：全面解析 options（支持数组、对象、字符串） =====
         let options = q.options;
-        // 1. 如果不是数组，尝试修复
+        
+        // 1. 如果 options 不是数组，尝试将其转换为数组
         if (!Array.isArray(options)) {
             console.warn(`题目 ${idx+1} 的 options 格式不正确，尝试修复:`, options);
-            // 如果是字符串，尝试按逗号、换行或空格分割
-            if (typeof options === 'string') {
-                // 先移除 "A. " "B. " 等前缀（如果存在）
-                let cleanStr = options.replace(/[A-D][.\s]+/g, ''); 
-                // 尝试按换行或逗号分割
+            
+            // 情况 A：options 是一个对象（例如 {A: "描述A", B: "描述B", ...}）
+            if (typeof options === 'object' && options !== null) {
+                // 按 A, B, C, D 的顺序提取值
+                const orderedKeys = ['A', 'B', 'C', 'D'];
+                let newOptions = [];
+                for (const key of orderedKeys) {
+                    if (options[key] !== undefined) {
+                        newOptions.push(options[key]);
+                    }
+                }
+                // 如果通过 A,B,C,D 没找到，就提取所有值
+                if (newOptions.length === 0) {
+                    newOptions = Object.values(options);
+                }
+                if (newOptions.length > 0) {
+                    options = newOptions;
+                } else {
+                    // 对象为空，使用默认值
+                    options = ['选项A', '选项B', '选项C', '选项D'];
+                }
+            } 
+            // 情况 B：options 是一个字符串（例如 "A. 描述A B. 描述B C. 描述C D. 描述D"）
+            else if (typeof options === 'string') {
+                // 先移除 "A. " "B. " 等前缀，再尝试按换行或逗号分割
+                let cleanStr = options.replace(/[A-D][.\s]+/g, '');
                 let splitOptions = cleanStr.split(/[\n,，]+/).map(s => s.trim()).filter(s => s.length > 0);
                 if (splitOptions.length >= 2) {
                     options = splitOptions;
                 } else {
-                    // 如果分割后选项不足，尝试按空格分割（可能是 "A B C D" 格式）
+                    // 如果分割后选项不足，尝试按空格分割
                     splitOptions = options.split(/\s+/).filter(s => s.length > 0);
                     if (splitOptions.length >= 2) {
                         options = splitOptions;
                     } else {
-                        // 实在无法解析，使用默认占位选项
-                        options = ['A. 选项A', 'B. 选项B', 'C. 选项C', 'D. 选项D'];
+                        options = ['选项A', '选项B', '选项C', '选项D'];
                     }
                 }
-            } else {
-                // 如果是 null 或 undefined 或其他类型，直接使用默认占位选项
-                options = ['A. 数据异常', 'B. 数据异常', 'C. 数据异常', 'D. 数据异常'];
+            } 
+            // 情况 C：其他类型（null, undefined 等）
+            else {
+                options = ['选项A', '选项B', '选项C', '选项D'];
             }
         }
+
         // 2. 确保至少有 2 个选项，不够的话补齐
         while (options.length < 2) {
             options.push(`选项 ${options.length + 1}`);
         }
-        // 如果选项超过 4 个，只取前 4 个（题目通常只要 4 个）
+        // 3. 如果选项超过 4 个，只取前 4 个
         if (options.length > 4) {
             options = options.slice(0, 4);
         }
         // ===== 🛡️ 修复结束 =====
 
+        // 渲染选项
         let optionsHtml = options.map((opt, oi) => {
             const label = String.fromCharCode(65 + oi);
             return `
