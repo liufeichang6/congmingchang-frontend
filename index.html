@@ -1873,17 +1873,31 @@ renderQuestions(questions);
             showToastMsg('错题已删除', 'success');
         }
 
-        function redoMistake(index) {
-            const q = mistakeData[index];
-            q.redoCount = (q.redoCount || 0) + 1;
-            // 模拟重做正确
-            if (Math.random() > 0.3) {
-                q.correctCount = (q.correctCount || 0) + 1;
-            }
-            localStorage.setItem(`mistake_book_${currentUser.id}`, JSON.stringify(mistakeData));
-            renderMistakes();
-            showToastMsg(' 已重做', 'info');
-        }
+function redoMistake(index) {
+    const q = mistakeData[index];
+    if (!q) return;
+
+    // 1. 将该错题设为当前题目（复制一份，避免污染）
+    const questionCopy = JSON.parse(JSON.stringify(q));
+    // 确保它有完整的 options 和 answer
+    if (!questionCopy.options || !questionCopy.answer) {
+        showToastMsg('错题数据不完整，无法重做', 'error');
+        return;
+    }
+
+    // 2. 清空之前的题目，只放入这一道
+    generatedQuestions = [questionCopy];
+
+    // 3. 切换到“生成习题”页面并渲染
+    switchPage('generate');
+    renderQuestions(generatedQuestions);
+
+    // 4. 记录当前重做的错题索引，用于提交后更新数据
+    window._redoMistakeIndex = index;
+
+    // 5. 提示用户
+    showToastMsg('🔄 请完成这道错题的重做', 'info');
+}
 
         function editCategory(index) {
             const q = mistakeData[index];
