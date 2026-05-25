@@ -1887,6 +1887,9 @@ function renderMistakes() {
         const redoCount = q.redoCount || 0;
         const correctCount = q.correctCount || 0;
         const rate = redoCount > 0 ? Math.round((correctCount / redoCount) * 100) : 0;
+        // 是否有已生成的薄弱知识点
+        const hasWeakness = q.weakness && q.weakness.title;
+        
         html += `
             <div class="mistake-item" data-index="${idx}">
                 <div class="checkbox-col">
@@ -1905,25 +1908,33 @@ function renderMistakes() {
                     <div class="mistake-actions">
                         <button class="btn-outline btn-sm" onclick="deleteMistake(${idx})">🗑️ 删除</button>
                         <button class="btn-primary btn-sm" onclick="redoMistake(${idx})">🔄 重做</button>
+                        <button class="btn-success btn-sm" onclick="analyzeWeaknessWithAI(${idx})">
+                            <i class="fas fa-brain"></i> AI分析薄弱点
+                        </button>
                     </div>
-                    <!-- 👇 薄弱知识点总结（放这里） 👇 -->
-                    <div style="margin-top:12px;padding:8px 14px;background:#f1f7fe;border-radius:8px;cursor:pointer;" onclick="toggleWeaknessSummary(${idx})">
-                        <div style="display:flex;justify-content:space-between;align-items:center;">
-                            <span style="font-size:14px;font-weight:500;">💡 薄弱知识点：${generateWeaknessSummary(q)}</span>
-                            <i class="fas fa-chevron-down" id="weaknessArrow_${idx}"></i>
+                    ${hasWeakness ? `
+                        <div style="margin-top:12px;padding:8px 14px;background:#f1f7fe;border-radius:8px;cursor:pointer;" onclick="toggleWeaknessSummary(${idx})">
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                                <span style="font-size:14px;font-weight:500;">💡 薄弱知识点：${q.weakness.title}</span>
+                                <i class="fas fa-chevron-down" id="weaknessArrow_${idx}"></i>
+                            </div>
+                            <div id="weaknessDetail_${idx}" style="display:none;margin-top:8px;padding:8px 12px;background:#fff;border-radius:6px;font-size:14px;color:#475569;">
+                                <strong>详细描述：</strong>${q.weakness.description}<br>
+                                <strong>核心要点：</strong>${q.weakness.keyPoints}<br>
+                                <button class="btn-primary btn-sm" onclick="generateFromWeaknessDetail('${q.weakness.title}')" style="margin-top:6px;">🎯 基于此知识点出题</button>
+                            </div>
                         </div>
-                        <div id="weaknessDetail_${idx}" style="display:none;margin-top:8px;padding:8px 12px;background:#fff;border-radius:6px;font-size:14px;color:#475569;">
-                            ${generateWeaknessDetail(q)}
+                    ` : `
+                        <div style="margin-top:8px;color:#94a3b8;font-size:13px;">
+                            <i class="far fa-clock"></i> 尚未生成薄弱知识点，点击上方「AI分析薄弱点」生成
                         </div>
-                    </div>
-                    <!-- 👆 到这里结束 👆 -->
+                    `}
                 </div>
             </div>
         `;
     });
     mistakeList.innerHTML = html;
 }
-
         function deleteMistake(index) {
             if (!confirm('确定要删除这条错题吗？')) return;
             mistakeData.splice(index, 1);
