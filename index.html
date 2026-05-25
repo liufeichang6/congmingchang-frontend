@@ -1957,7 +1957,115 @@ function redoMistake(index) {
     // 5. 提示用户
     showToastMsg('🔄 请完成这道错题的重做', 'info');
 }
+// ---------- 错题重做界面交互 ----------
+// 提交答案
+document.getElementById('redoSubmitBtn').addEventListener('click', function() {
+    const idx = window._redoCurrentIndex;
+    const q = mistakeData[idx];
+    if (!q) return;
+    
+    const inputs = document.querySelectorAll('#redoQuestionArea input[type="radio"], #redoQuestionArea input[type="checkbox"]');
+    const selected = [];
+    inputs.forEach(input => {
+        if (input.checked) selected.push(input.value);
+    });
+    
+    if (selected.length === 0) {
+        showToastMsg('请先选择一个选项', 'info');
+        return;
+    }
+    
+    const correct = Array.isArray(q.answer) ? q.answer : [q.answer];
+    const isCorrect = JSON.stringify(selected.sort()) === JSON.stringify(correct.sort());
+    
+    // 显示答案
+    const feedback = document.getElementById('redoAnswerFeedback');
+    feedback.style.display = 'block';
+    document.getElementById('redoAnswerText').textContent = Array.isArray(q.answer) ? q.answer.join('、') : q.answer;
+    document.getElementById('redoExplanationText').textContent = q.explanation;
+    
+    // 更新正确率（实时）
+    q.redoCount = (q.redoCount || 0) + 1;
+    if (isCorrect) {
+        q.correctCount = (q.correctCount || 0) + 1;
+        showToastMsg('✅ 回答正确！', 'success');
+    } else {
+        showToastMsg('❌ 回答错误，正确答案已显示', 'error');
+    }
+    localStorage.setItem(`mistake_book_${currentUser.id}`, JSON.stringify(mistakeData));
+    
+    // 重新渲染错题本（实时更新正确率）
+    renderMistakes();
+    
+    // 禁用选项
+    inputs.forEach(input => input.disabled = true);
+    this.disabled = true;
+    this.textContent = '已提交';
+    
+    // 显示下一题按钮
+    if (idx < mistakeData.length - 1) {
+        document.getElementById('redoNextBtn').style.display = 'inline-flex';
+        document.getElementById('redoNextBtn').textContent = '下一题';
+    } else {
+        document.getElementById('redoNextBtn').textContent = '已完成';
+        document.getElementById('redoNextBtn').style.display = 'inline-flex';
+    }
+});
 
+// 下一题
+document.getElementById('redoNextBtn').addEventListener('click', function() {
+    const idx = window._redoCurrentIndex;
+    if (idx < mistakeData.length - 1) {
+        openRedoMistake(idx + 1);
+    } else {
+        showToastMsg('🎉 已完成所有错题重做！', 'success');
+        switchPage('mistake');
+    }
+});
+
+// 返回错题本
+document.getElementById('redoBackBtn').addEventListener('click', function() {
+    switchPage('mistake');
+});
+
+// 打开错题重做界面
+function openRedoMistake(index) {
+    const q = mistakeData[index];
+    if (!q) return;
+    
+    // 切换到重做页面
+    switchPage('redo-mistake');
+    
+    // 显示题目
+    const isMulti = Array.isArray(q.answer) && q.answer.length > 1;
+    const inputType = isMulti ? 'checkbox' : 'radio';
+    const name = `redo_q_${index}`;
+    let optionsHtml = q.options.map((opt, oi) => {
+        const label = String.fromCharCode(65 + oi);
+        return `<label style="display:block;padding:4px 0;cursor:pointer;font-size:14px;">
+            <input type="${inputType}" name="${name}" value="${label}" style="margin-right:8px;">
+            ${label}. ${opt.replace(/^[A-D]\.\s*/, '')}
+        </label>`;
+    }).join('');
+    
+    document.getElementById('redoQuestionArea').innerHTML = `
+        <div style="background:#f8fafc;border-radius:14px;padding:18px 22px;border:1px solid #e9edf2;">
+            <div style="font-weight:600;margin-bottom:8px;"><span style="color:#1e40af;">${index + 1}.</span> ${q.question}</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;padding-left:4px;">${optionsHtml}</div>
+            <div id="redoAnswerFeedback" style="display:none;margin-top:10px;padding:8px 14px;background:#eef2ff;border-radius:8px;font-size:14px;">
+                <span style="font-weight:600;color:#1e40af;">✅ 答案：</span><span id="redoAnswerText"></span>
+                <span style="color:#64748b;margin-left:12px;">📖 </span><span id="redoExplanationText"></span>
+            </div>
+        </div>
+    `;
+    document.getElementById('redoProgress').textContent = `${index + 1} / ${mistakeData.length}`;
+    
+    // 存储当前索引
+    window._redoCurrentIndex = index;
+    document.getElementById('redoNextBtn').style.display = 'none';
+    document.getElementById('redoSubmitBtn').disabled = false;
+    document.getElementById('redoSubmitBtn').textContent = '提交答案';
+}
         function editCategory(index) {
             const q = mistakeData[index];
             const newCategory = prompt('请输入新的分类名称：', q.category || '默认');
