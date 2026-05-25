@@ -2132,8 +2132,32 @@ document.getElementById('redoBackBtn').addEventListener('click', function() {
 
 // 打开错题重做界面
 function openRedoMistake(index) {
+    console.log('openRedoMistake 被调用，index =', index);
+    console.log('mistakeData =', mistakeData);
+    
+    // 检查当前用户
+    if (!currentUser) {
+        showToastMsg('请先登录', 'error');
+        return;
+    }
+    
+    // 检查错题数据
+    if (!mistakeData || mistakeData.length === 0) {
+        showToastMsg('错题本为空，请先产生错题', 'info');
+        return;
+    }
+    
     const q = mistakeData[index];
-    if (!q) return;
+    if (!q) {
+        showToastMsg('找不到该错题，索引可能无效', 'error');
+        return;
+    }
+    
+    // 检查题目数据完整性
+    if (!q.question || !q.options || !q.answer) {
+        showToastMsg('错题数据不完整，无法重做', 'error');
+        return;
+    }
     
     // 切换到重做页面
     switchPage('redo-mistake');
@@ -2142,6 +2166,7 @@ function openRedoMistake(index) {
     const isMulti = Array.isArray(q.answer) && q.answer.length > 1;
     const inputType = isMulti ? 'checkbox' : 'radio';
     const name = `redo_q_${index}`;
+    
     let optionsHtml = q.options.map((opt, oi) => {
         const label = String.fromCharCode(65 + oi);
         return `<label style="display:block;padding:4px 0;cursor:pointer;font-size:14px;">
@@ -2150,7 +2175,14 @@ function openRedoMistake(index) {
         </label>`;
     }).join('');
     
-    document.getElementById('redoQuestionArea').innerHTML = `
+    const redoArea = document.getElementById('redoQuestionArea');
+    if (!redoArea) {
+        console.error('redoQuestionArea 元素未找到！');
+        showToastMsg('页面错误：找不到题目容器', 'error');
+        return;
+    }
+    
+    redoArea.innerHTML = `
         <div style="background:#f8fafc;border-radius:14px;padding:18px 22px;border:1px solid #e9edf2;">
             <div style="font-weight:600;margin-bottom:8px;"><span style="color:#1e40af;">${index + 1}.</span> ${q.question}</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;padding-left:4px;">${optionsHtml}</div>
@@ -2160,6 +2192,7 @@ function openRedoMistake(index) {
             </div>
         </div>
     `;
+    
     document.getElementById('redoProgress').textContent = `${index + 1} / ${mistakeData.length}`;
     
     // 存储当前索引
@@ -2167,6 +2200,8 @@ function openRedoMistake(index) {
     document.getElementById('redoNextBtn').style.display = 'none';
     document.getElementById('redoSubmitBtn').disabled = false;
     document.getElementById('redoSubmitBtn').textContent = '提交答案';
+    
+    console.log('重做页面渲染完成');
 }
         function editCategory(index) {
             const q = mistakeData[index];
