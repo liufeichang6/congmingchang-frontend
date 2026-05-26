@@ -3290,7 +3290,27 @@ submitFeedbackBtn.addEventListener('click', async () => {
         showToastMsg('提交失败：' + err.message, 'error');
     }
 });
-
+// ========== 管理员：加载用户列表 ==========
+async function loadAdminUsers() {
+    if (!currentUser || currentUser.role !== 'admin') return;
+    try {
+        const response = await fetch(`${API_BASE_URL}/admin/users`, {
+            headers: {
+                'Authorization': `Bearer ${authToken}`
+            }
+        });
+        if (response.ok) {
+            const data = await response.json();
+            allUsers = data; // 后端直接返回用户数组
+            renderAdminUsers();
+        } else {
+            showToastMsg('加载用户列表失败', 'error');
+        }
+    } catch (err) {
+        console.error('加载用户列表失败:', err);
+        showToastMsg('加载用户列表失败：' + err.message, 'error');
+    }
+}
 function renderAdminUsers() {
     userTableBody.innerHTML = '';
     if (!allUsers || allUsers.length === 0) {
