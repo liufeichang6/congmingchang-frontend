@@ -3817,21 +3817,17 @@ async function deleteFeedback(feedbackId) {
 // 绑定收件箱按钮
 document.getElementById('showInboxBtn').addEventListener('click', showInbox);
         // ========== 保存题目到习题总库 ==========
-function saveToLibrary(newQuestions) {
+function saveToLibrary(newQuestions, sourceType = '用户生成') {
     if (!currentUser || !newQuestions || newQuestions.length === 0) return;
     
-    // 从 localStorage 加载现有的总库
     let library = JSON.parse(localStorage.getItem(`library_${currentUser.id}`) || '[]');
     
-    // 去重：检查每道新题是否已经存在于总库（根据题干文本判断）
     let addedCount = 0;
     newQuestions.forEach(q => {
-        // 检查是否已存在（忽略首尾空格）
         const exists = library.some(item => item.question.trim() === q.question.trim());
         if (!exists) {
-            // 给题目添加来源和时间戳
             const date = new Date().toISOString();
-            const source = q.source || '用户生成';
+            const source = sourceType;  // ✅ 使用传入的 sourceType
             library.push({
                 ...q,
                 source: source,
@@ -3842,17 +3838,13 @@ function saveToLibrary(newQuestions) {
         }
     });
     
-    // 保存回 localStorage
     localStorage.setItem(`library_${currentUser.id}`, JSON.stringify(library));
     
-    // 如果总库页面已经打开，刷新显示
     if (currentPage === 'library') {
-        // 重新加载总库数据并渲染
         libraryData = library;
         renderLibrary();
     }
-    
-    console.log(`已保存 ${addedCount} 道新题到习题总库`);
+    console.log(`已保存 ${addedCount} 道新题到习题总库（来源：${sourceType}）`);
 }
         // ========== 第四步：退出登录 ==========
 document.getElementById('logoutBtn').addEventListener('click', function() {
