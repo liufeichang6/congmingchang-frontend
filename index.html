@@ -1659,7 +1659,7 @@ async function generateFromChunk(text, count, diff, type, returnOnly = false) {
     showToastMsg(`✅ 成功生成 ${filtered.length} 道题目`, 'success');
     return filtered;
 }
-        generateBtn.addEventListener('click', );
+generateBtn.addEventListener('click', generateQuestions);
 // ========== 随机生题 ==========
 async function generateRandomQuestions() {
     if (typeof extractedText === 'undefined' || !extractedText) {
@@ -1926,7 +1926,7 @@ async function generatePaper() {
             renderQuestions(allQuestions);
             updateFileList();
             showToastMsg(`✅ 组卷完成！共 ${allQuestions.length} 道题，涵盖 ${chapters.length} 个章节`, 'success');// 保存到习题总库
-saveToLibrary(allQuestions);
+saveToLibrary(allQuestions, '组卷');
         }
 
         btn.disabled = false;
