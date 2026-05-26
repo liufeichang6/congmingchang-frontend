@@ -3284,18 +3284,19 @@ submitFeedbackBtn.addEventListener('click', async () => {
         showToastMsg('提交失败：' + err.message, 'error');
     }
 });
-// ========== 管理员：加载用户列表 ==========
+// ========== 管理员：加载用户列表（防堆积版本） ==========
+let refreshTimer = null; // 定义在函数外，用于控制定时器
+
 async function loadAdminUsers() {
     if (!currentUser || currentUser.role !== 'admin') return;
+    
     try {
         const response = await fetch(`${API_BASE_URL}/admin/users`, {
-            headers: {
-                'Authorization': `Bearer ${authToken}`
-            }
+            headers: { 'Authorization': `Bearer ${authToken}` }
         });
         if (response.ok) {
             const data = await response.json();
-            allUsers = data; // 后端直接返回用户数组
+            allUsers = data;
             renderAdminUsers();
         } else {
             showToastMsg('加载用户列表失败', 'error');
@@ -3303,15 +3304,14 @@ async function loadAdminUsers() {
     } catch (err) {
         console.error('加载用户列表失败:', err);
         showToastMsg('加载用户列表失败：' + err.message, 'error');
+    } finally {
+        // ✅ 关键：无论成功还是失败，都在 5 秒后启动下一次刷新
+        if (refreshTimer) clearTimeout(refreshTimer);
+        if (currentUser?.role === 'admin') {
+            refreshTimer = setTimeout(loadAdminUsers, 5000);
+        }
     }
-}
-// ---------- 初始化定时器（只执行一次，放在登录成功调用 loadAdminUsers 之后） ----------
-// 代码里在管理员登录成功后执行 loadAdminUsers()，此后补充：
-if (!window._adminRefreshTimer && currentUser?.role === 'admin') {
-    window._adminRefreshTimer = setInterval(() => {
-        loadAdminUsers();
-    }, 5000);
-}        
+}  
 function renderAdminUsers() {
     userTableBody.innerHTML = '';
     if (!allUsers || allUsers.length === 0) {
@@ -3587,6 +3587,14 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
         if (user.role === 'admin' || user.username === 'liufeichang') {
             adminMenuItem.style.display = 'block';
             loadAdminUsers();
+            if (user.role === 'admin' || user.username === 'liufeichang') {
+    adminMenuItem.style.display = 'block';
+    loadAdminUsers();
+    loadInbox();
+    // ✅ 启动定时刷新
+    if (refreshTimer) clearTimeout(refreshTimer);
+    refreshTimer = setTimeout(loadAdminUsers, 5000);
+}
             loadInbox(); // 加载收件箱
         }
     } catch (err) {
@@ -3904,6 +3912,12 @@ function saveToLibrary(newQuestions, sourceType = '用户生成') {
         // ========== 第四步：退出登录 ==========
 document.getElementById('logoutBtn').addEventListener('click', function() {
     if (!confirm('确定要退出登录吗？')) return;
+
+        // ✅ 停止定时刷新
+    if (refreshTimer) {
+        clearTimeout(refreshTimer);
+        refreshTimer = null;
+    }
     
     sessionStorage.removeItem('token');
     authToken = null;
