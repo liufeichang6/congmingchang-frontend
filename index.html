@@ -1432,7 +1432,7 @@
                 if (newName && newName.trim() !== '') {
                     nameSpan.textContent = newName.trim();
                     nameSpan.title = newName.trim();
-                    showToastMsg('✅ 题集已重命名', 'success');
+                    showToastMsg(' 题集已重命名', 'success');
                 }
             }
         });
@@ -1513,13 +1513,13 @@ async function handleFile(file) {
             return;
         }
 
-        // ✅ 这里最关键！一定要把提取到的文本赋值给全局变量 extractedText
+        //  这里最关键！一定要把提取到的文本赋值给全局变量 extractedText
         extractedText = extracted;
         uploadedFileName = file.name.replace(/\.docx$/i, '');
 
-        uploadStatus.textContent = `✅ 解析成功！共 ${extractedText.length} 字符，文档：${uploadedFileName}`;
+        uploadStatus.textContent = ` 解析成功！共 ${extractedText.length} 字符，文档：${uploadedFileName}`;
         uploadStatus.className = 'upload-status';
-        showToastMsg(`✅ 文档 "${uploadedFileName}" 解析成功`, 'success');
+        showToastMsg(` 文档 "${uploadedFileName}" 解析成功`, 'success');
 
         if (!collectionName.value.trim()) {
             collectionName.value = uploadedFileName;
@@ -1585,15 +1585,15 @@ async function generateQuestions() {
         generatedQuestions = allQuestions;
         renderQuestions(allQuestions);
         updateFileList();
-        showToastMsg(`✅ 成功生成 ${allQuestions.length} 道题目（分段加速）`, 'success');
+        showToastMsg(` 成功生成 ${allQuestions.length} 道题目（分段加速）`, 'success');
     } catch (err) {
-        showToastMsg('❌ 生成失败：' + err.message, 'error');
+        showToastMsg(' 生成失败：' + err.message, 'error');
     }finally {
-        // ✅ 保存到习题总库（加上来源标记）
+        //  保存到习题总库（加上来源标记）
         if (allQuestions && allQuestions.length > 0) {
             saveToLibrary(allQuestions, '普通生成');
         }
-        // ✅ 恢复按钮状态（必须放在 finally 内部）
+        //  恢复按钮状态（必须放在 finally 内部）
         generateBtn.disabled = false;
         generateBtn.innerHTML = '生成题目';
     }
@@ -1656,7 +1656,7 @@ async function generateFromChunk(text, count, diff, type, returnOnly = false) {
     generatedQuestions = filtered;
     renderQuestions(filtered);
     updateFileList();
-    showToastMsg(`✅ 成功生成 ${filtered.length} 道题目`, 'success');
+    showToastMsg(` 成功生成 ${filtered.length} 道题目`, 'success');
     return filtered;
 }
 generateBtn.addEventListener('click', generateQuestions);
@@ -1698,7 +1698,7 @@ async function generateRandomQuestions() {
         generatedQuestions = allQuestions;
         renderQuestions(allQuestions);
         updateFileList();
-        showToastMsg(`✅ 随机生成 ${allQuestions.length} 道题目`, 'success');// 保存到习题总库
+        showToastMsg(` 随机生成 ${allQuestions.length} 道题目`, 'success');// 保存到习题总库
 saveToLibrary(allQuestions, '随机生题');
     } catch (err) {
         showToastMsg('❌ 随机生成失败：' + err.message, 'error');
@@ -1916,7 +1916,7 @@ async function generatePaper() {
                 }
             });
             
-            showToastMsg(`📊 已处理 ${Math.min(i + BATCH_SIZE, chapters.length)}/${chapters.length} 章，已生成 ${total} 题`, 'info');
+            showToastMsg(` 已处理 ${Math.min(i + BATCH_SIZE, chapters.length)}/${chapters.length} 章，已生成 ${total} 题`, 'info');
         }
 
         if (allQuestions.length === 0) {
@@ -1925,7 +1925,7 @@ async function generatePaper() {
             generatedQuestions = allQuestions;
             renderQuestions(allQuestions);
             updateFileList();
-            showToastMsg(`✅ 组卷完成！共 ${allQuestions.length} 道题，涵盖 ${chapters.length} 个章节`, 'success');// 保存到习题总库
+            showToastMsg(` 组卷完成！共 ${allQuestions.length} 道题，涵盖 ${chapters.length} 个章节`, 'success');// 保存到习题总库
 saveToLibrary(allQuestions, '组卷');
         }
 
@@ -1957,7 +1957,7 @@ function renderQuestions(questions) {
         const inputType = isMulti ? 'checkbox' : 'radio';
         const name = `q_${idx}`;
 
-        // ===== 🛡️ 核心修复：全面解析 options（支持数组、对象、字符串） =====
+        // ===== 核心修复：全面解析 options（支持数组、对象、字符串） =====
         let options = q.options;
         
         // 1. 如果 options 不是数组，尝试将其转换为数组
@@ -2016,7 +2016,7 @@ function renderQuestions(questions) {
         if (options.length > 4) {
             options = options.slice(0, 4);
         }
-        // ===== 🛡️ 修复结束 =====
+        // =====  修复结束 =====
 
         // 渲染选项
         let optionsHtml = options.map((opt, oi) => {
@@ -2038,7 +2038,7 @@ function renderQuestions(questions) {
                 <div class="action-area" style="margin-top:10px;">
                     ${showPerQuestionBtn ? `<button class="btn btn-primary btn-sm check-single-btn" data-index="${idx}">检查本题</button>` : ''}
                     <div id="answerFeedback_${idx}" style="display:none;margin-top:10px;padding:8px 14px;background:#eef2ff;border-radius:8px;font-size:14px;">
-                        <span style="font-weight:600;color:#1e40af;">✅ 答案：</span><span id="answerText_${idx}"></span>
+                        <span style="font-weight:600;color:#1e40af;"> 答案：</span><span id="answerText_${idx}"></span>
                         <span style="color:#64748b;margin-left:12px;">📖 </span><span id="explanationText_${idx}"></span>
                     </div>
                 </div>
@@ -2097,7 +2097,7 @@ function renderQuestions(questions) {
             statusSpan.style.fontWeight = '600';
             if (isCorrect) {
                 statusSpan.style.color = '#16a34a';
-                statusSpan.textContent = '✅ 正确';
+                statusSpan.textContent = ' 正确';
             } else {
                 statusSpan.style.color = '#dc2626';
                 statusSpan.textContent = '❌ 错误';
@@ -2166,7 +2166,7 @@ if (typeof window._redoMistakeIndex !== 'undefined' && window._redoMistakeIndex 
                 statusSpan.style.fontWeight = '600';
                 if (isCorrect) {
                     statusSpan.style.color = '#16a34a';
-                    statusSpan.textContent = '✅ 正确';
+                    statusSpan.textContent = ' 正确';
                 } else {
                     statusSpan.style.color = '#dc2626';
                     statusSpan.textContent = '❌ 错误';
@@ -2254,7 +2254,7 @@ function renderMistakes() {
                     </div>
                     <div class="mistake-actions">
                         <button class="btn-outline btn-sm" onclick="deleteMistake(${idx})">🗑️ 删除</button>
-                        <button class="btn-primary btn-sm" onclick="redoMistake(${idx})">🔄 重做</button>
+                        <button class="btn-primary btn-sm" onclick="redoMistake(${idx})"> 重做</button>
                         <button class="btn-success btn-sm" onclick="analyzeWeaknessWithAI(${idx})">
                             <i class="fas fa-brain"></i> AI分析薄弱点
                         </button>
@@ -2267,7 +2267,7 @@ function renderMistakes() {
                     <div id="answerBlock_${idx}" style="display:none; margin-top:12px; padding:12px 16px; background:#fff3cd; border-radius:8px; border-left:4px solid #f59e0b;">
                         <div style="display:flex; gap:20px; flex-wrap:wrap;">
                             <div style="flex:1;">
-                                <strong style="color:#1e40af;">✅ 正确答案：</strong>
+                                <strong style="color:#1e40af;"> 正确答案：</strong>
                                 <span style="font-weight:600; color:#16a34a;">${answerText}</span>
                             </div>
                             <div style="flex:2;">
@@ -2280,7 +2280,7 @@ function renderMistakes() {
 ${hasWeakness ? `
     <div style="margin-top:12px;padding:8px 14px;background:#f1f7fe;border-radius:8px;cursor:pointer;" onclick="toggleWeaknessSummary(${idx})">
         <div style="display:flex;justify-content:space-between;align-items:center;">
-            <span style="font-size:14px;font-weight:500;">💡 薄弱知识点：${q.weakness.title}</span>
+            <span style="font-size:14px;font-weight:500;"> 薄弱知识点：${q.weakness.title}</span>
             <i class="fas fa-chevron-down" id="weaknessArrow_${idx}"></i>
         </div>
         <div id="weaknessDetail_${idx}" style="display:none;margin-top:8px;padding:8px 12px;background:#fff;border-radius:6px;font-size:14px;color:#475569;">
@@ -2392,7 +2392,7 @@ async function analyzeWeaknessWithAI(index) {
         
         // 重新渲染错题本
         renderMistakes();
-        showToastMsg(`✅ 已生成薄弱知识点：${weakness.title}`, 'success');
+        showToastMsg(` 已生成薄弱知识点：${weakness.title}`, 'success');
         
     } catch (err) {
         console.error('AI分析失败:', err);
@@ -2470,7 +2470,7 @@ document.getElementById('redoSubmitBtn').addEventListener('click', function() {
     q.redoCount = (q.redoCount || 0) + 1;
     if (isCorrect) {
         q.correctCount = (q.correctCount || 0) + 1;
-        showToastMsg('✅ 回答正确！', 'success');
+        showToastMsg(' 回答正确！', 'success');
     } else {
         showToastMsg('❌ 回答错误，正确答案已显示', 'error');
     }
@@ -2500,7 +2500,7 @@ document.getElementById('redoNextBtn').addEventListener('click', function() {
     if (idx < mistakeData.length - 1) {
         openRedoMistake(idx + 1);
     } else {
-        showToastMsg('🎉 已完成所有错题重做！', 'success');
+        showToastMsg(' 已完成所有错题重做', 'success');
         switchPage('mistake');
     }
 });
@@ -2567,7 +2567,7 @@ function openRedoMistake(index) {
             <div style="font-weight:600;margin-bottom:8px;"><span style="color:#1e40af;">${index + 1}.</span> ${q.question}</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;padding-left:4px;">${optionsHtml}</div>
             <div id="redoAnswerFeedback" style="display:none;margin-top:10px;padding:8px 14px;background:#eef2ff;border-radius:8px;font-size:14px;">
-                <span style="font-weight:600;color:#1e40af;">✅ 答案：</span><span id="redoAnswerText"></span>
+                <span style="font-weight:600;color:#1e40af;"> 答案：</span><span id="redoAnswerText"></span>
                 <span style="color:#64748b;margin-left:12px;">📖 </span><span id="redoExplanationText"></span>
             </div>
         </div>
@@ -2590,7 +2590,7 @@ function openRedoMistake(index) {
                 q.category = newCategory.trim();
                 localStorage.setItem(`mistake_book_${currentUser.id}`, JSON.stringify(mistakeData));
                 renderMistakes();
-                showToastMsg('✅ 分类已更新', 'success');
+                showToastMsg(' 分类已更新', 'success');
             }
         }
 
@@ -2800,24 +2800,24 @@ async function generateFromWeaknessDetail(index) {
                 <div style="font-weight:600;margin-bottom:8px;">📝 ${question.question}</div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;padding-left:4px;">${optionsHtml}</div>
                 <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;">
-                    <button class="btn-primary btn-sm" onclick="checkWeaknessAnswer(${index})">✅ 查看答案</button>
+                    <button class="btn-primary btn-sm" onclick="checkWeaknessAnswer(${index})"> 查看答案</button>
                     <button class="btn-outline btn-sm" onclick="closeWeaknessQuestion(${index})">✕ 收起</button>
                 </div>
                 <div id="weaknessAnswerFeedback_${index}" style="display:none;margin-top:10px;padding:8px 14px;background:#eef2ff;border-radius:8px;font-size:14px;">
-                    <span style="font-weight:600;color:#1e40af;">✅ 正确答案：</span><span style="color:#16a34a;font-weight:600;">${answerText}</span>
+                    <span style="font-weight:600;color:#1e40af;"> 正确答案：</span><span style="color:#16a34a;font-weight:600;">${answerText}</span>
                     <br><span style="color:#64748b;">📖 ${question.explanation || '无解析'}</span>
                 </div>
             </div>
         `;
         
-        showToastMsg(`✅ 已生成一道关于 "${weakness.title}" 的题目`, 'success');
+        showToastMsg(` 已生成一道关于 "${weakness.title}" 的题目`, 'success');
         
     } catch (err) {
         console.error('出题失败:', err);
         showToastMsg(`❌ 出题失败：${err.message}`, 'error');
     } finally {
         btn.disabled = false;
-        btn.innerHTML = '🎯 基于此知识点出题';
+        btn.innerHTML = ' 基于此知识点出题';
     }
 }
 // 检查错题本中生成的题目的答案
@@ -2957,14 +2957,14 @@ async function generateFromWeakness(index) {
         // 渲染题目
         renderQuestions(questions);
         switchPage('generate');
-        showToastMsg(`🎯 已根据 "${w.title}" 生成 ${questions.length} 道题目`, 'success');
+        showToastMsg(` 已根据 "${w.title}" 生成 ${questions.length} 道题目`, 'success');
         
     } catch (err) {
         console.error('出题失败:', err);
         showToastMsg(`❌ 出题失败：${err.message}`, 'error');
     } finally {
         btn.disabled = false;
-        btn.innerHTML = '🎯 生成题目';
+        btn.innerHTML = ' 生成题目';
     }
 }
 
@@ -3041,14 +3041,14 @@ weaknessGenerateBtn.addEventListener('click', async function() {
         
         renderQuestions(questions);
         switchPage('generate');
-        showToastMsg(`🎯 已根据薄弱知识点生成 ${questions.length} 道题目`, 'success');
+        showToastMsg(` 已根据薄弱知识点生成 ${questions.length} 道题目`, 'success');
         
     } catch (err) {
         console.error('出题失败:', err);
         showToastMsg(`❌ 出题失败：${err.message}`, 'error');
     } finally {
         this.disabled = false;
-        this.innerHTML = '🎯 按薄弱点出题';
+        this.innerHTML = ' 按薄弱点出题';
     }
 });
 
@@ -3058,12 +3058,6 @@ weaknessGenerateBtn.addEventListener('click', async function() {
             // 从 localStorage 加载
             mnemonicData = JSON.parse(localStorage.getItem(`mnemonic_${currentUser.id}`) || '[]');
             if (mnemonicData.length === 0) {
-                // 模拟一些口诀
-                mnemonicData = [
-                    { text: '一碳单位，二氢叶酸，三羧循环，四氢叶酸', meaning: '一碳单位代谢相关口诀', source: '生物化学' },
-                    { text: '心衰治疗：强心利尿扩血管，正性肌力减负荷', meaning: '心力衰竭治疗原则口诀', source: '药理学' },
-                    { text: '阿司匹林：解热镇痛抗炎，抑制血小板聚集', meaning: '阿司匹林药理作用口诀', source: '药理学' }
-                ];
                 localStorage.setItem(`mnemonic_${currentUser.id}`, JSON.stringify(mnemonicData));
             }
             renderMnemonics();
@@ -3079,13 +3073,13 @@ weaknessGenerateBtn.addEventListener('click', async function() {
                 html += `
                         <div class="mnemonic-item">
                             <div>
-                                <div class="mnemonic-text">📌 ${m.text}</div>
+                                <div class="mnemonic-text"> ${m.text}</div>
                                 <div class="mnemonic-meaning">${m.meaning || '点击搜索查看含义'}</div>
                                 <span style="font-size:12px;color:#94a3b8;">📁 ${m.source || '未知'}</span>
                             </div>
                             <div class="mnemonic-actions">
                                 <button class="btn-outline btn-sm" onclick="searchMnemonic(${idx})"><i class="fas fa-search"></i> 含义</button>
-                                <button class="btn-primary btn-sm" onclick="generateFromMnemonic(${idx})">📝 生成题目</button>
+                                <button class="btn-primary btn-sm" onclick="generateFromMnemonic(${idx})"> 生成题目</button>
                                 <button class="btn-danger btn-sm" onclick="deleteMnemonic(${idx})">🗑️</button>
                             </div>
                         </div>
@@ -3117,7 +3111,7 @@ weaknessGenerateBtn.addEventListener('click', async function() {
             ];
             renderQuestions(qs);
             switchPage('generate');
-            showToastMsg(`📝 已根据口诀 "${m.text}" 生成 2 道题目`, 'success');
+            showToastMsg(` 已根据口诀 "${m.text}" 生成 2 道题目`, 'success');
         }
 
         function deleteMnemonic(idx) {
@@ -3189,7 +3183,7 @@ weaknessGenerateBtn.addEventListener('click', async function() {
                         <div class="library-item">
                             <div class="lib-info">
                                 <div class="lib-name">${q.question}</div>
-                                <div class="lib-meta">✅ ${answerText}  |  📁 ${q.source || '未知'}  |  📅 ${q.date || '未知'}</div>
+                                <div class="lib-meta"> ${answerText}  |  📁 ${q.source || '未知'}  |  📅 ${q.date || '未知'}</div>
                             </div>
                             <div>
                                 <button class="btn-outline btn-sm" onclick="addToPractice(${idx})">📋 加入练习</button>
@@ -3281,7 +3275,7 @@ submitFeedbackBtn.addEventListener('click', async () => {
             })
         });
         if (response.ok) {
-            showToastMsg('✅ 意见已提交，感谢您的反馈！', 'success');
+            showToastMsg(' 意见已提交，感谢您的反馈！', 'success');
             feedbackContent.value = '';
         } else {
             showToastMsg('提交失败，请重试', 'error');
@@ -3311,6 +3305,13 @@ async function loadAdminUsers() {
         showToastMsg('加载用户列表失败：' + err.message, 'error');
     }
 }
+// ---------- 初始化定时器（只执行一次，放在登录成功调用 loadAdminUsers 之后） ----------
+// 代码里在管理员登录成功后执行 loadAdminUsers()，此后补充：
+if (!window._adminRefreshTimer && currentUser?.role === 'admin') {
+    window._adminRefreshTimer = setInterval(() => {
+        loadAdminUsers();
+    }, 5000);
+}        
 function renderAdminUsers() {
     userTableBody.innerHTML = '';
     if (!allUsers || allUsers.length === 0) {
@@ -3339,31 +3340,65 @@ function renderAdminUsers() {
     userCount.textContent = allUsers.length;
 }
 
-        function banUser(id) {
-            if (!confirm('确定要封禁该用户吗？')) return;
-            const u = allUsers.find(usr => usr.id === id);
-            if (u) { u.status = 'banned';
-                renderAdminUsers();
-                showToastMsg(`已封禁 ${u.username}`, 'success'); }
-        }
-
-        function unbanUser(id) {
-            const u = allUsers.find(usr => usr.id === id);
-            if (u) { u.status = 'offline';
-                renderAdminUsers();
-                showToastMsg(`已解封 ${u.username}`, 'success'); }
-        }
-
-        function deleteUser(id) {
-            if (!confirm('确定要删除该用户吗？此操作不可恢复！')) return;
-            const idx = allUsers.findIndex(usr => usr.id === id);
-            if (idx !== -1) {
-                const name = allUsers[idx].username;
-                allUsers.splice(idx, 1);
-                renderAdminUsers();
-                showToastMsg(`已删除用户 ${name}`, 'success');
+async function banUser(id) {
+    if (!confirm('确定要封禁该用户吗？')) return;
+    try {
+        const response = await fetch(`${API_BASE_URL}/admin/users/${id}/ban`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${authToken}`
             }
+        });
+        if (response.ok) {
+            showToastMsg(' 用户已封禁', 'success');
+            await loadAdminUsers(); // 刷新列表
+        } else {
+            showToastMsg('封禁失败', 'error');
         }
+    } catch (err) {
+        showToastMsg('封禁失败：' + err.message, 'error');
+    }
+}
+
+async function unbanUser(id) {
+    if (!confirm('确定要解封该用户吗？')) return;
+    try {
+        const response = await fetch(`${API_BASE_URL}/admin/users/${id}/unban`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${authToken}`
+            }
+        });
+        if (response.ok) {
+            showToastMsg(' 用户已解封', 'success');
+            await loadAdminUsers();
+        } else {
+            showToastMsg('解封失败', 'error');
+        }
+    } catch (err) {
+        showToastMsg('解封失败：' + err.message, 'error');
+    }
+}
+
+async function deleteUser(id) {
+    if (!confirm('确定要删除该用户吗？此操作不可恢复！')) return;
+    try {
+        const response = await fetch(`${API_BASE_URL}/admin/users/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${authToken}`
+            }
+        });
+        if (response.ok) {
+            showToastMsg(' 用户已删除', 'success');
+            await loadAdminUsers();
+        } else {
+            showToastMsg('删除失败', 'error');
+        }
+    } catch (err) {
+        showToastMsg('删除失败：' + err.message, 'error');
+    }
+}
 
         // ---------- 生成账号 ----------
         showGenAccountBtn.addEventListener('click', () => {
@@ -3408,7 +3443,7 @@ confirmGenBtn.addEventListener('click', async () => {
         passwords.push(password);
     }
     
-    // ✅ 调用后端 API 批量生成真实账号
+    //  调用后端 API 批量生成真实账号
     try {
         const response = await fetch(`${API_BASE_URL}/admin/generate-users`, {
             method: 'POST',
@@ -3431,7 +3466,7 @@ confirmGenBtn.addEventListener('click', async () => {
             
             // 刷新用户列表
             await loadAdminUsers();
-            showToastMsg(`✅ 已生成 ${results.length} 个真实账号`, 'success');
+            showToastMsg(` 已生成 ${results.length} 个真实账号`, 'success');
             // 清空输入
             singleUsername.value = '';
             singlePassword.value = '';
@@ -3453,7 +3488,7 @@ async function login(username, password) {
     const data = await response.json();
     if (data.token) {
         authToken = data.token;
-        // 🔁 将 localStorage 改为 sessionStorage
+        //  将 localStorage 改为 sessionStorage
         sessionStorage.setItem('token', authToken);
         currentUser = data.user;
         return data.user;
@@ -3470,7 +3505,7 @@ async function register(username, password, nickname) {
     const data = await response.json();
     if (data.token) {
         authToken = data.token;
-        // 🔁 将 localStorage 改为 sessionStorage
+        //  将 localStorage 改为 sessionStorage
         sessionStorage.setItem('token', authToken);
         currentUser = data.user;
         return data.user;
@@ -3535,10 +3570,10 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
     }
     try {
         const user = await login(username, password);
-        // ✅ 登录成功后自动关闭登录窗口
+        //  登录成功后自动关闭登录窗口
         document.getElementById('loginOverlay').style.display = 'none';
         
-        // ✅ 记住密码（保存到 localStorage）
+        //  记住密码（保存到 localStorage）
         localStorage.setItem('remembered_username', username);
         localStorage.setItem('remembered_password', password);
         
@@ -3574,9 +3609,9 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
                 resultDiv.innerHTML = users.map(u => `用户名: ${u.username}  密码: ${u.password}`).join('\n');
                 const text = users.map(u => `用户名: ${u.username} 密码: ${u.password}`).join('\n');
                 navigator.clipboard.writeText(text).then(() => {
-                    alert('✅ 已生成 ' + users.length + ' 个账号，已复制到剪贴板！');
+                    alert(' 已生成 ' + users.length + ' 个账号，已复制到剪贴板！');
                 }).catch(() => {
-                    alert('✅ 已生成 ' + users.length + ' 个账号，请手动复制。');
+                    alert(' 已生成 ' + users.length + ' 个账号，请手动复制。');
                 });
             } catch (err) {
                 alert('生成失败：' + err.message);
@@ -3643,7 +3678,7 @@ document.getElementById('randomGenerateBtn').addEventListener('click', generateR
 document.getElementById('paperGenerateBtn').addEventListener('click', generatePaper);
 // ---------- 初始化 ----------
 (async function() {
-    // ✅ 填充记住的用户名和密码
+    //  填充记住的用户名和密码
     const rememberedUsername = localStorage.getItem('remembered_username');
     const rememberedPassword = localStorage.getItem('remembered_password');
     if (rememberedUsername && rememberedPassword) {
@@ -3651,7 +3686,7 @@ document.getElementById('paperGenerateBtn').addEventListener('click', generatePa
         document.getElementById('loginPassword').value = rememberedPassword;
     }
     
-    // ✅ 从 sessionStorage 获取 token（关闭页面后自动消失）
+    //  从 sessionStorage 获取 token（关闭页面后自动消失）
     const tokenFromSession = sessionStorage.getItem('token');
     if (tokenFromSession) {
         authToken = tokenFromSession;
@@ -3659,7 +3694,7 @@ document.getElementById('paperGenerateBtn').addEventListener('click', generatePa
         authToken = null;
     }
     
-    // ✅ 验证 token（如果有）
+    //  验证 token（如果有）
     if (authToken) {
         const user = await verifyToken();
         if (user) {
@@ -3801,7 +3836,7 @@ async function markFeedbackRead(feedbackId) {
             }
         });
         if (response.ok) {
-            showToastMsg('✅ 已标记为已读', 'success');
+            showToastMsg(' 已标记为已读', 'success');
             showInbox();
             await loadInbox();
         } else {
@@ -3823,7 +3858,7 @@ async function deleteFeedback(feedbackId) {
             }
         });
         if (response.ok) {
-            showToastMsg('✅ 已删除', 'success');
+            showToastMsg(' 已删除', 'success');
             showInbox();
             await loadInbox();
         } else {
@@ -3847,7 +3882,7 @@ function saveToLibrary(newQuestions, sourceType = '用户生成') {
         const exists = library.some(item => item.question.trim() === q.question.trim());
         if (!exists) {
             const date = new Date().toISOString();
-            const source = sourceType;  // ✅ 使用传入的 sourceType
+            const source = sourceType;  //  使用传入的 sourceType
             library.push({
                 ...q,
                 source: source,
@@ -3930,7 +3965,7 @@ function renderLibrary() {
             <div class="library-item">
                 <div class="lib-info">
                     <div class="lib-name">${q.question}</div>
-                    <div class="lib-meta">✅ ${answerText}  |  📁 ${q.source || '未知'}  |  📅 ${q.date || '未知'}</div>
+                    <div class="lib-meta"> ${answerText}  |  📁 ${q.source || '未知'}  |  📅 ${q.date || '未知'}</div>
                 </div>
                 <div>
                     <button class="btn-outline btn-sm" onclick="addToPractice(${idx})">📋 加入练习</button>
@@ -4003,7 +4038,7 @@ function saveToLibrary(newQuestions, sourceType = '用户生成') {
         Promise.allSettled(promises).then(results => {
             const successCount = results.filter(r => r.status === 'fulfilled' && r.value.ok).length;
             if (successCount > 0) {
-                console.log(`✅ 已同步 ${successCount} 道题目到后端数据库`);
+                console.log(` 已同步 ${successCount} 道题目到后端数据库`);
             }
             const failCount = results.filter(r => r.status === 'rejected' || !r.value.ok).length;
             if (failCount > 0) {
