@@ -1099,6 +1099,8 @@
                                 <textarea id="feedbackContent" placeholder="请输入您的意见或建议..."></textarea>
                             </div>
                             <button class="btn-success" id="submitFeedbackBtn">提交意见</button>
+                            <hr style="border:none;border-top:1px solid #e9edf2;margin:16px 0;" />
+<button class="btn-danger" id="logoutBtn">🚪 退出登录</button>
                         </div>
                     </div>
 
@@ -1536,7 +1538,7 @@ async function handleFile(file) {
         }
 
 // ========== 生成题目（支持大文档 + 加速） ==========
-async function generateQuestions() {
+async function () {
     if (typeof extractedText === 'undefined' || !extractedText || extractedText.trim().length < 10) {
         showToastMsg('⚠️ 请先上传包含有效文字的 Word 文档', 'error');
         return;
@@ -1586,8 +1588,80 @@ async function generateQuestions() {
         showToastMsg(`✅ 成功生成 ${allQuestions.length} 道题目（分段加速）`, 'success');
     } catch (err) {
         showToastMsg('❌ 生成失败：' + err.message, 'error');
-    } // 保存到习题总库
-saveToLibrary(allQuestions);finally {
+    } finally {
+    // 保存到习题总库
+// ========== 保存题目到习题总库（同步到后端） ==========
+function saveToLibrary(newQuestions) {
+    if (!currentUser || !newQuestions || newQuestions.length === 0) return;
+    
+    let library = JSON.parse(localStorage.getItem(`library_${currentUser.id}`) || '[]');
+    
+    let addedCount = 0;
+    let newQuestionsToSend = []; // 👈 新增：用于存储需要发送到后端的题目
+    
+    newQuestions.forEach(q => {
+        const exists = library.some(item => item.question.trim() === q.question.trim());
+        if (!exists) {
+            const date = new Date().toISOString();
+            const source = q.source || '用户生成';
+            library.push({
+                ...q,
+                source: source,
+                date: date,
+                addedAt: date
+            });
+            addedCount++;
+            // 👇 新增：记录需要同步到后端的题目
+            newQuestionsToSend.push({
+                ...q,
+                source: source
+            });
+        }
+    });
+    
+    localStorage.setItem(`library_${currentUser.id}`, JSON.stringify(library));
+    
+    // 👇 新增：同步到后端数据库
+    if (newQuestionsToSend.length > 0) {
+        // 并发发送请求，提高效率
+        const promises = newQuestionsToSend.map(q => {
+            return fetch(`${API_BASE_URL}/questions`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify({
+                    collection_id: null, // 不指定题集，存为无题集
+                    content: q.question,
+                    options: q.options,
+                    answer: q.answer,
+                    explanation: q.explanation || '',
+                    type: '单选题', // 默认题型，可根据实际调整
+                    difficulty: '中等' // 默认难度，可根据实际调整
+                })
+            });
+        });
+        
+        // 等待所有请求完成，但不阻塞后续操作
+        Promise.allSettled(promises).then(results => {
+            const successCount = results.filter(r => r.status === 'fulfilled' && r.value.ok).length;
+            if (successCount > 0) {
+                console.log(`✅ 已同步 ${successCount} 道题目到后端数据库`);
+            }
+            const failCount = results.filter(r => r.status === 'rejected' || !r.value.ok).length;
+            if (failCount > 0) {
+                console.warn(`⚠️ ${failCount} 道题目同步失败，已保留在本地`);
+            }
+        });
+    }
+    
+    if (currentPage === 'library') {
+        libraryData = library;
+        renderLibrary();
+    }
+    console.log(`已保存 ${addedCount} 道新题到习题总库（本地+后端）`);
+}
         generateBtn.disabled = false;
         generateBtn.innerHTML = '生成题目';
     }
@@ -1653,7 +1727,7 @@ async function generateFromChunk(text, count, diff, type, returnOnly = false) {
     showToastMsg(`✅ 成功生成 ${filtered.length} 道题目`, 'success');
     return filtered;
 }
-        generateBtn.addEventListener('click', generateQuestions);
+        generateBtn.addEventListener('click', );
 // ========== 随机生题 ==========
 async function generateRandomQuestions() {
     if (typeof extractedText === 'undefined' || !extractedText) {
@@ -1693,7 +1767,7 @@ async function generateRandomQuestions() {
         renderQuestions(allQuestions);
         updateFileList();
         showToastMsg(`✅ 随机生成 ${allQuestions.length} 道题目`, 'success');// 保存到习题总库
-saveToLibrary(allQuestions);
+saveToLibrary(allQuestions, '随机生题');
     } catch (err) {
         showToastMsg('❌ 随机生成失败：' + err.message, 'error');
     } finally {
@@ -3417,40 +3491,41 @@ confirmGenBtn.addEventListener('click', async () => {
     }
 });
 
-        // ---------- 登录/注册 API ----------
-        async function login(username, password) {
-            const response = await fetch(`${API_BASE_URL}/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            });
-            const data = await response.json();
-            if (data.token) {
-                authToken = data.token;
-                localStorage.setItem('token', authToken);
-                currentUser = data.user;
-                return data.user;
-            } else {
-                throw new Error(data.error);
-            }
-        }
-
-        async function register(username, password, nickname) {
-            const response = await fetch(`${API_BASE_URL}/register`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password, nickname })
-            });
-            const data = await response.json();
-            if (data.token) {
-                authToken = data.token;
-                localStorage.setItem('token', authToken);
-                currentUser = data.user;
-                return data.user;
-            } else {
-                throw new Error(data.error);
-            }
-        }
+// ---------- 登录/注册 API ----------
+async function login(username, password) {
+    const response = await fetch(`${API_BASE_URL}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+    });
+    const data = await response.json();
+    if (data.token) {
+        authToken = data.token;
+        // 🔁 将 localStorage 改为 sessionStorage
+        sessionStorage.setItem('token', authToken);
+        currentUser = data.user;
+        return data.user;
+    } else {
+        throw new Error(data.error);
+    }
+}
+async function register(username, password, nickname) {
+    const response = await fetch(`${API_BASE_URL}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password, nickname })
+    });
+    const data = await response.json();
+    if (data.token) {
+        authToken = data.token;
+        // 🔁 将 localStorage 改为 sessionStorage
+        sessionStorage.setItem('token', authToken);
+        currentUser = data.user;
+        return data.user;
+    } else {
+        throw new Error(data.error);
+    }
+}
 
         async function verifyToken() {
             if (!authToken) return null;
@@ -3614,33 +3689,52 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
         });
 document.getElementById('randomGenerateBtn').addEventListener('click', generateRandomQuestions);
 document.getElementById('paperGenerateBtn').addEventListener('click', generatePaper);
-        // ---------- 初始化 ----------
-        (async function() {
-                const rememberedUsername = localStorage.getItem('remembered_username');
+// ---------- 初始化 ----------
+(async function() {
+    // ✅ 填充记住的用户名和密码
+    const rememberedUsername = localStorage.getItem('remembered_username');
     const rememberedPassword = localStorage.getItem('remembered_password');
     if (rememberedUsername && rememberedPassword) {
         document.getElementById('loginUsername').value = rememberedUsername;
         document.getElementById('loginPassword').value = rememberedPassword;
     }
     
-            const user = await verifyToken();
-            if (user) {
-                currentUser = user;
-                loginOverlay.style.display = 'none';
-                loadMistakes();
-                loadLibrary();
-                loadWeakness();
-                loadMnemonics();
-                loadAccountInfo();
-                if (user.role === 'admin' || user.username === 'liufeichang') {
-                    adminMenuItem.style.display = 'block';
-                    loadAdminUsers();
-                }
-            } else {
-                loginOverlay.style.display = 'none';
+    // ✅ 从 sessionStorage 获取 token（关闭页面后自动消失）
+    const tokenFromSession = sessionStorage.getItem('token');
+    if (tokenFromSession) {
+        authToken = tokenFromSession;
+    } else {
+        authToken = null;
+    }
+    
+    // ✅ 验证 token（如果有）
+    if (authToken) {
+        const user = await verifyToken();
+        if (user) {
+            currentUser = user;
+            loginOverlay.style.display = 'none';
+            loadMistakes();
+            loadLibrary();
+            loadWeakness();
+            loadMnemonics();
+            loadAccountInfo();
+            if (user.role === 'admin' || user.username === 'liufeichang') {
+                adminMenuItem.style.display = 'block';
+                loadAdminUsers();
+                loadInbox();
             }
-            console.log('🧠 聪明肠 · 聪明蛋平台已启动');
-        })();
+        } else {
+            sessionStorage.removeItem('token');
+            authToken = null;
+            // 显示登录窗口（已填充用户名密码）
+            loginOverlay.style.display = 'flex';
+        }
+    } else {
+        loginOverlay.style.display = 'flex';
+    }
+    
+    console.log('🧠 聪明肠 · 聪明蛋平台已启动（安全模式：关闭页面自动退出）');
+})();
 
         // ---------- 显示时机设置 ----------
         document.querySelectorAll('input[name="answerDisplay"]').forEach(radio => {
@@ -3827,6 +3921,158 @@ function saveToLibrary(newQuestions) {
     }
     
     console.log(`已保存 ${addedCount} 道新题到习题总库`);
+}
+        // ========== 第四步：退出登录 ==========
+document.getElementById('logoutBtn').addEventListener('click', function() {
+    if (!confirm('确定要退出登录吗？')) return;
+    
+    sessionStorage.removeItem('token');
+    authToken = null;
+    currentUser = null;
+    
+    // 重置页面状态
+    generatedQuestions = [];
+    mistakeData = [];
+    weaknessData = [];
+    mnemonicData = [];
+    libraryData = [];
+    allUsers = [];
+    
+    adminMenuItem.style.display = 'none';
+    
+    goHome();
+    document.getElementById('loginOverlay').style.display = 'flex';
+    showToastMsg('已退出登录', 'info');
+});
+
+// ========== 第五步：习题总库删除和来源标记 ==========
+
+// 1. 修改 renderLibrary 函数（添加删除按钮）
+function renderLibrary() {
+    let data = libraryData;
+    const keyword = librarySearch.value.trim().toLowerCase();
+    const timeFilter = libraryTimeFilter.value;
+
+    if (keyword) {
+        data = data.filter(q => q.question.toLowerCase().includes(keyword));
+    }
+    if (timeFilter !== 'all') {
+        const now = new Date();
+        data = data.filter(q => {
+            const d = new Date(q.date || now);
+            if (timeFilter === 'today') return d.toDateString() === now.toDateString();
+            if (timeFilter === 'week') {
+                const weekStart = new Date(now);
+                weekStart.setDate(now.getDate() - now.getDay());
+                return d >= weekStart;
+            }
+            if (timeFilter === 'month') {
+                return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+            }
+            return true;
+        });
+    }
+
+    if (data.length === 0) {
+        libraryList.innerHTML = `<div style="color:#94a3b8;text-align:center;padding:40px 0;">习题总库为空</div>`;
+        document.querySelector('#page-library .page-header span').textContent = '共 0 题';
+        return;
+    }
+    document.querySelector('#page-library .page-header span').textContent = `共 ${data.length} 题`;
+    let html = '';
+    data.forEach((q, idx) => {
+        const answerText = Array.isArray(q.answer) ? q.answer.join('、') : q.answer;
+        html += `
+            <div class="library-item">
+                <div class="lib-info">
+                    <div class="lib-name">${q.question}</div>
+                    <div class="lib-meta">✅ ${answerText}  |  📁 ${q.source || '未知'}  |  📅 ${q.date || '未知'}</div>
+                </div>
+                <div>
+                    <button class="btn-outline btn-sm" onclick="addToPractice(${idx})">📋 加入练习</button>
+                    <button class="btn-danger btn-sm" onclick="deleteFromLibrary(${idx})">🗑️ 删除</button>
+                </div>
+            </div>
+        `;
+    });
+    libraryList.innerHTML = html;
+}
+
+// 2. 删除习题总库中的题目
+function deleteFromLibrary(index) {
+    if (!confirm('确定要删除这道题吗？')) return;
+    const q = libraryData[index];
+    libraryData.splice(index, 1);
+    localStorage.setItem(`library_${currentUser.id}`, JSON.stringify(libraryData));
+    renderLibrary();
+    showToastMsg('已删除', 'success');
+}
+
+// 3. 修改 saveToLibrary（添加来源标记参数）
+function saveToLibrary(newQuestions, sourceType = '用户生成') {
+    if (!currentUser || !newQuestions || newQuestions.length === 0) return;
+    
+    let library = JSON.parse(localStorage.getItem(`library_${currentUser.id}`) || '[]');
+    let addedCount = 0;
+    let newQuestionsToSend = [];
+    
+    newQuestions.forEach(q => {
+        const exists = library.some(item => item.question.trim() === q.question.trim());
+        if (!exists) {
+            const date = new Date().toISOString();
+            const source = sourceType; // 使用传入的 sourceType
+            library.push({
+                ...q,
+                source: source,
+                date: date,
+                addedAt: date
+            });
+            addedCount++;
+            newQuestionsToSend.push({
+                ...q,
+                source: source
+            });
+        }
+    });
+    
+    localStorage.setItem(`library_${currentUser.id}`, JSON.stringify(library));
+    
+    if (newQuestionsToSend.length > 0) {
+        const promises = newQuestionsToSend.map(q => {
+            return fetch(`${API_BASE_URL}/questions`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify({
+                    collection_id: null,
+                    content: q.question,
+                    options: q.options,
+                    answer: q.answer,
+                    explanation: q.explanation || '',
+                    type: '单选题',
+                    difficulty: '中等'
+                })
+            });
+        });
+        Promise.allSettled(promises).then(results => {
+            const successCount = results.filter(r => r.status === 'fulfilled' && r.value.ok).length;
+            if (successCount > 0) {
+                console.log(`✅ 已同步 ${successCount} 道题目到后端数据库`);
+            }
+            const failCount = results.filter(r => r.status === 'rejected' || !r.value.ok).length;
+            if (failCount > 0) {
+                console.warn(`⚠️ ${failCount} 道题目同步失败，已保留在本地`);
+            }
+        });
+    }
+    
+    if (currentPage === 'library') {
+        libraryData = library;
+        renderLibrary();
+    }
+    console.log(`已保存 ${addedCount} 道新题到习题总库（来源：${sourceType}）`);
 }
         console.log(' 所有功能已就绪');
     </script>
