@@ -1538,7 +1538,7 @@ async function handleFile(file) {
         }
 
 // ========== 生成题目（支持大文档 + 加速） ==========
-async function () {
+async function generateQuestions() {
     if (typeof extractedText === 'undefined' || !extractedText || extractedText.trim().length < 10) {
         showToastMsg('⚠️ 请先上传包含有效文字的 Word 文档', 'error');
         return;
@@ -1588,80 +1588,12 @@ async function () {
         showToastMsg(`✅ 成功生成 ${allQuestions.length} 道题目（分段加速）`, 'success');
     } catch (err) {
         showToastMsg('❌ 生成失败：' + err.message, 'error');
-    } finally {
-    // 保存到习题总库
-// ========== 保存题目到习题总库（同步到后端） ==========
-function saveToLibrary(newQuestions) {
-    if (!currentUser || !newQuestions || newQuestions.length === 0) return;
-    
-    let library = JSON.parse(localStorage.getItem(`library_${currentUser.id}`) || '[]');
-    
-    let addedCount = 0;
-    let newQuestionsToSend = []; // 👈 新增：用于存储需要发送到后端的题目
-    
-    newQuestions.forEach(q => {
-        const exists = library.some(item => item.question.trim() === q.question.trim());
-        if (!exists) {
-            const date = new Date().toISOString();
-            const source = q.source || '用户生成';
-            library.push({
-                ...q,
-                source: source,
-                date: date,
-                addedAt: date
-            });
-            addedCount++;
-            // 👇 新增：记录需要同步到后端的题目
-            newQuestionsToSend.push({
-                ...q,
-                source: source
-            });
+    }finally {
+        // ✅ 保存到习题总库（加上来源标记）
+        if (allQuestions && allQuestions.length > 0) {
+            saveToLibrary(allQuestions, '普通生成');
         }
-    });
-    
-    localStorage.setItem(`library_${currentUser.id}`, JSON.stringify(library));
-    
-    // 👇 新增：同步到后端数据库
-    if (newQuestionsToSend.length > 0) {
-        // 并发发送请求，提高效率
-        const promises = newQuestionsToSend.map(q => {
-            return fetch(`${API_BASE_URL}/questions`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${authToken}`
-                },
-                body: JSON.stringify({
-                    collection_id: null, // 不指定题集，存为无题集
-                    content: q.question,
-                    options: q.options,
-                    answer: q.answer,
-                    explanation: q.explanation || '',
-                    type: '单选题', // 默认题型，可根据实际调整
-                    difficulty: '中等' // 默认难度，可根据实际调整
-                })
-            });
-        });
-        
-        // 等待所有请求完成，但不阻塞后续操作
-        Promise.allSettled(promises).then(results => {
-            const successCount = results.filter(r => r.status === 'fulfilled' && r.value.ok).length;
-            if (successCount > 0) {
-                console.log(`✅ 已同步 ${successCount} 道题目到后端数据库`);
-            }
-            const failCount = results.filter(r => r.status === 'rejected' || !r.value.ok).length;
-            if (failCount > 0) {
-                console.warn(`⚠️ ${failCount} 道题目同步失败，已保留在本地`);
-            }
-        });
-    }
-    
-    if (currentPage === 'library') {
-        libraryData = library;
-        renderLibrary();
-    }
-    console.log(`已保存 ${addedCount} 道新题到习题总库（本地+后端）`);
-}
+        // ✅ 恢复按钮状态（必须放在 finally 内部）
         generateBtn.disabled = false;
         generateBtn.innerHTML = '生成题目';
     }
