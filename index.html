@@ -3451,10 +3451,12 @@ confirmGenBtn.addEventListener('click', async () => {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${authToken}`
             },
-            body: JSON.stringify({ 
-                count: usernames.length, 
-                prefix: genPrefix.value.trim() || 'user' 
-            })
+body: JSON.stringify({ 
+    count: usernames.length, 
+    prefix: genPrefix.value.trim() || 'user',
+    usernames: usernames,      // 👈 新增
+    passwords: passwords       // 👈 新增
+})
         });
         const data = await response.json();
         if (data.users) {
